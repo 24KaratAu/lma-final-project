@@ -1,0 +1,6 @@
+{"src": "ICA-27-E1", "dst": "ICA-27", "type": "exception_to", "source": "parsed"}
+{"src": "ICA-28-E1", "dst": "ICA-28", "type": "exception_to", "source": "parsed"}
+{"src": "ICA-28-E2", "dst": "ICA-28", "type": "exception_to", "source": "parsed"}
+{"src": "ICA-28-E3", "dst": "ICA-28", "type": "exception_to", "source": "parsed"}
+{"src": "R-FX-1", "dst": "ICA-27", "type": "interprets", "source": "manual"}
+{"src": "R-FX-2", "dst": "ICA-28", "type": "interprets", "source": "manual"}

@@ -1,0 +1,27 @@
+{
+  "lease_id": "L00",
+  "clauses": [
+    {"clause_id": "L00-1.1", "number": "1.1", "heading": "Definitions: Restricted Period", "text": "\"Restricted Period\" means the period of three (3) years commencing on the expiry or earlier termination of this Lease."},
+    {"clause_id": "L00-1.2", "number": "1.2", "heading": "Definitions: Security Instrument", "text": "\"Security Instrument\" means the unconditional guarantee issued by a scheduled bank in favour of the Lessor under Clause 22 as security for the Lessee's obligations."},
+    {"clause_id": "L00-2", "number": "2", "heading": "Premises", "text": "The Lessor lets to the Lessee the shop at Unit 4, Ground Floor, Fixture Arcade, Pune, for a term of nine (9) years (the \"Term\")."},
+    {"clause_id": "L00-5", "number": "5", "heading": "Stamp duty and registration", "text": "The Lessee shall bear the stamp duty and registration charges payable on this Lease."},
+    {"clause_id": "L00-14", "number": "14", "heading": "Non-competition", "text": "The Lessee shall not, during the Restricted Period, carry on or be engaged in any business similar to that carried on at the Premises within a radius of five (5) kilometres of the Premises."},
+    {"clause_id": "L00-15", "number": "15", "heading": "Use of premises", "text": "During the Term, the Lessee shall use the Premises only as a retail showroom for garments and shall not carry on any other trade or business at the Premises."},
+    {"clause_id": "L00-16", "number": "16", "heading": "Assignment with goodwill", "text": "If the Lessee assigns this Lease together with the goodwill of the business carried on at the Premises, the Lessee shall not carry on a similar business within two (2) kilometres of the Premises for so long as the assignee carries on that business there."},
+    {"clause_id": "L00-17", "number": "17", "heading": "Lessor's decision final", "text": "The Lessor's decision on any dispute arising under this Lease shall be final and binding on the Lessee, and the Lessee shall not be entitled to challenge it in any court or before any authority."},
+    {"clause_id": "L00-18", "number": "18", "heading": "Arbitration", "text": "Any dispute between the parties arising out of or in connection with this Lease shall be referred to arbitration by a sole arbitrator under the Arbitration and Conciliation Act, 1996, and the award shall be final and binding on both parties."},
+    {"clause_id": "L00-19", "number": "19", "heading": "Jurisdiction", "text": "The courts at New Delhi alone shall have jurisdiction over all disputes arising under this Lease."},
+    {"clause_id": "L00-20", "number": "20", "heading": "Time for claims", "text": "Any claim by the Lessee against the Lessor under this Lease shall be barred unless a suit is filed within three (3) months of the event giving rise to the claim."},
+    {"clause_id": "L00-21", "number": "21", "heading": "Notice of defects", "text": "The Lessee shall notify the Lessor in writing of any structural defect in the Premises within thirty (30) days of discovering it."},
+    {"clause_id": "L00-22", "number": "22", "heading": "Security", "text": "All rights of the Lessor under the Security Instrument shall stand extinguished, and the issuer shall be discharged from all liability under it, on the expiry of twelve (12) months from the end of the Term."}
+  ],
+  "definitions": [
+    {"term": "Restricted Period", "clause_id": "L00-1.1", "text": "the period of three (3) years commencing on the expiry or earlier termination of this Lease"},
+    {"term": "Security Instrument", "clause_id": "L00-1.2", "text": "the unconditional guarantee issued by a scheduled bank in favour of the Lessor under Clause 22"}
+  ],
+  "refs": [
+    {"src": "L00-14", "dst": "L00-1.1", "type": "uses_term"},
+    {"src": "L00-22", "dst": "L00-1.2", "type": "uses_term"},
+    {"src": "L00-1.2", "dst": "L00-22", "type": "refers_to"}
+  ]
+}

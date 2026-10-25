@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Run outputs and logs (copy results you keep into the report, not git)
+runs/
+logs/
+
+# Model weights and caches (PLAN.md section 10)
+*.safetensors
+*.bin
+*.pt
+*.gguf
+hf/
+
+# Secrets
+.env
+
+# Raw lease PDFs; commit cleaned text only
+data/raw/
