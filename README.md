@@ -23,4 +23,4 @@ pytest -q
 
 ## Rules
 
-Work on a branch (`data/`, `graph/`, `model/`, `agent/`, `eval/` + topic), open a PR, get one approval. `main` is protected and the `test` check must pass.
+Work on a branch (`data/`, `graph/`, `model/`, `agent/`, `eval/` + topic) and open a PR. You can merge your own PR once the `test` check passes and your branch is up to date with `main`; GitHub blocks it otherwise. The full checklist is in [`CLAUDE.md`](CLAUDE.md).
