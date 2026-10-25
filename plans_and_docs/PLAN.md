@@ -423,3 +423,61 @@ Cut in this order; the main research question survives all of them.
 5. Test set down from 340 to about 240, keeping all three types and both forms
 
 Do not cut: the pilot, the frozen test set, naive RAG against graph RAG, the frontier baseline, the no-retrieval and no-adapter ablations.
+
+---
+
+## 13. Backup plan
+
+Use this section if the team runs with three people. The legal and data workstream (section 1, about 130 hours) is then split equally, about 43 hours each, on top of each person's own workstream. That raises everyone to roughly eight hours a day until 13 Nov.
+
+**The lawyer.** A lawyer has agreed to review our labels (`docs/legal/Lawyer_brief.docx`). The lawyer labels every pilot, dev and test clause **blind**, without seeing our answers. We compare their answers with ours, report the agreement, and the lawyer's answer decides where we differ. If the lawyer can only do the minimum (session 1, a 40-clause sample and the disagreements), we label the rest ourselves with cross-labelling (below).
+
+### How the work is split
+
+**Clause writing is split by defect type.** Each person owns one type end to end: writes the clauses and look-alikes, keeps the answer key, sends batches to the lawyer, and fixes their own items after the disagreement review. This keeps the load equal and makes each person the expert on one section for the viva.
+
+| Person | Defect type | Dev items | Test items | Out-of-scope items |
+|---|---|---|---|---|
+| Avnish | Restraint of trade (s.27) | 20 | 100 (50 defects, 50 look-alikes) | 14 |
+| Saksham | Bar on legal proceedings (s.28(a), first part) | 20 | 100 (50 defects, 50 look-alikes) | 13 |
+| Amitabh | Time limits (s.28(a) second part, s.28(b)) | 20 | 100 (50 defects, 50 look-alikes) | 13 |
+
+About a third of each person's items are in the cross-clause form. Drafts come from the open-model drafting job on Kaggle (section 9) and are edited by hand.
+
+**The rest of the legal and data workstream:**
+
+| Task | New owner | Hours |
+|---|---|---|
+| Lawyer contact: scheduling, both sessions, sending batches, collecting answer sheets | Avnish | 8 |
+| Pilot: plant defects, seal the answer key, run the models, score | Avnish | 8 |
+| Freeze the test set on Fri 6 Nov and tag `test-v1` | Avnish | 1 |
+| Report: validation section (labelling method, lawyer agreement) | Avnish | 3 |
+| Collect 15–20 more leases as clean text, update `data/sources.csv` | Saksham | 6 |
+| Rulings sheet and `interprets` edges (section 7), checked by the lawyer | Saksham | 8 |
+| Gold tool traces for 30 clauses | Saksham | 5 |
+| Report: dataset section | Saksham | 3 |
+| Item-drafting job on Kaggle for all three people | Amitabh | 4 |
+| Legal commentary on the failure cases | Amitabh | 6 |
+| Ten worked hard cases for the report, with Avnish | Amitabh | 4 |
+| Stretch: 20–30 real clauses from reported judgments | Amitabh | 6 |
+| **Own defect type** (dev 20, test 100, out-of-scope ~13, fixes) | Each person | about 20 each |
+
+Totals: Avnish about 40 hours, Saksham about 42, Amitabh about 40.
+
+### Dates
+
+| When | What |
+|---|---|
+| Mon 26 Oct | Pilot done (Avnish) |
+| Tue 27 or Wed 28 Oct | Lawyer session 1: types, look-alikes, checklists, the two questions, 20 pilot clauses, list of rulings |
+| Thu 29 Oct | Dev set: 20 items each, merged and sent to the lawyer as Batch A |
+| Sat 31 Oct – Tue 3 Nov | Test items sent to the lawyer in batches of about 50 as each person finishes them; all 340 by Tue 3 Nov |
+| Thu 5 Nov | Lawyer session 2: disagreements and ruling summaries |
+| Fri 6 Nov | Test set frozen and tagged `test-v1` |
+
+### Rules that change
+
+- **Who sees the test set before the freeze:** all three of us, since we each write part of it. Nobody runs any model or system on test items before the freeze, and all tuning stays on the dev set.
+- **Training data:** Amitabh commits the training-pair generation config before Sat 31 Oct, before he writes any test items, so the training data cannot drift towards the test phrasing. One phrasing family per type stays held out (section 11).
+- **Second labeller:** replaced by the lawyer. If the lawyer cannot label Batch B, we cross-label blind: Saksham labels Avnish's items, Amitabh labels Saksham's, and Avnish labels Amitabh's (about 4 extra hours each).
+- **Answer keys** are committed per batch before the batch goes to the lawyer, and never edited afterwards. Changes after the lawyer's review go in a separate corrections file.
