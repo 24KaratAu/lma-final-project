@@ -394,7 +394,7 @@ Rules for the baseline:
 
 ## 10. Git rules
 
-- Private repository. `main` is protected: changes arrive by pull request with one reviewer and a passing fixture test.
+- Private repository. `main` is protected: changes arrive by pull request, and anyone can merge their own PR once the `test` check passes on a branch that is up to date with `main`. The pre-merge checklist is in `CLAUDE.md` at the repo root.
 - Branch names: `<prefix>/<short-topic>`, for example `graph/lease-parser`.
 - Stay inside your own folders. A change to a schema in section 4 needs all four to agree.
 - Merge small and often; rebase on `main` before each checkpoint.
