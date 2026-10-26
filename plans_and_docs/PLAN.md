@@ -428,6 +428,34 @@ Do not cut: the pilot, the frozen test set, naive RAG against graph RAG, the fro
 
 ## 13. Backup plan
 
+> **In force from Mon 26 Oct 2026.** The team runs with three people. Where this section and sections 1–8 disagree, this section wins.
+
+### Until the mid-submission (Mon 26 – Fri 30 Oct)
+
+Avnish has no new tasks until the mid-submission: he has already done the repository, the shared contracts, the pilot leases, the 20 pilot clauses and answer key, and the lawyer work so far (see the credit notes in sections 2, 3, 5 and 8). The 20 pilot clauses count as 20 of the 60 dev items. Everything left before the mid-submission is split between Saksham and Amitabh.
+
+| Task | Owner | Due | Hours |
+|---|---|---|---|
+| Own workstream: statute graph, lease parser, embedding index, flat retrieval, B2 script and B2 on dev | Saksham | Thu 29 | 20 |
+| **Lawyer contact** from now on: send Batch A (dev clauses), chase replies, later batches and Session 2 | Saksham | Thu 29 | 1 |
+| Pilot: run the two frontier models on `data/pilot/planted/`, save raw answers, count misses and false alarms | Saksham | Tue 27 | 2 |
+| Dev clauses: 13 bar on proceedings, 7 restraint of trade | Saksham | Thu 29 morning | 3 |
+| Update section 6 and `ELEMENTS` in `src/common/schemas.py` with the lawyer's corrections (`docs/legal/session1_review.md`); fix fixture FX-09 | Saksham | Tue 27 | 2 |
+| One-page answers note to the TA | Saksham | Wed 28 | 1 |
+| Put together and submit the mid-submission; tag `mid-v1` | Saksham | Fri 30 | 4 |
+| Own workstream: Kaggle smoke test, B1 on dev, choice of base models, 100-pair trial, item-drafting job | Amitabh | Thu 29 | 18 |
+| Dev clauses: 14 time limits, 7 restraint of trade | Amitabh | Thu 29 morning | 3 |
+| Evaluation harness, mid-submission scope: defect recall, false-alarm rate, defect F1, citation correctness, section recall@5, by type and form | Amitabh | Wed 28 | 6 |
+| Element-check prompts for the three types | Amitabh | Thu 29 | 3 |
+| Ablation on dev: base model with no retrieval against flat retrieval | Amitabh | Thu 29 | 2 |
+| Score B1 and B2 with the harness | Amitabh | Thu 29 | 1 |
+
+Totals: Saksham about 33 hours, Amitabh about 33 hours. Each writes the mid-submission sections for their own work. The rest of the harness (element accuracy, evidence-path recall, tool-call metrics) comes after the mid-submission. More leases and the rulings sheet also move to after the mid-submission.
+
+### After the mid-submission
+
+The split below applies from Sat 31 Oct.
+
 Use this section if the team runs with three people. The legal and data workstream (section 1, about 130 hours) is then split equally, about 43 hours each, on top of each person's own workstream. That raises everyone to roughly eight hours a day until 13 Nov.
 
 **The lawyer.** A lawyer has agreed to review our labels (`docs/legal/Lawyer_brief.docx`). The lawyer labels every pilot, dev and test clause **blind**, without seeing our answers. We compare their answers with ours, report the agreement, and the lawyer's answer decides where we differ. If the lawyer can only do the minimum (session 1, a 40-clause sample and the disagreements), we label the rest ourselves with cross-labelling (below).
@@ -448,8 +476,8 @@ About a third of each person's items are in the cross-clause form. Drafts come f
 
 | Task | New owner | Hours |
 |---|---|---|
-| Lawyer contact: scheduling, both sessions, sending batches, collecting answer sheets | Avnish | 8 |
-| Pilot: plant defects, seal the answer key, run the models, score | Avnish | 8 |
+| Lawyer contact: scheduling, both sessions, sending batches, collecting answer sheets | Saksham (from 26 Oct; set up by Avnish) | 8 |
+| Pilot: plant defects, seal the answer key, run the models, score | Avnish (planting and key, done); Saksham (model runs and counting) | 8 |
 | Freeze the test set on Fri 6 Nov and tag `test-v1` | Avnish | 1 |
 | Report: validation section (labelling method, lawyer agreement) | Avnish | 3 |
 | Collect 15–20 more leases as clean text, update `data/sources.csv` | Saksham | 6 |
@@ -462,7 +490,7 @@ About a third of each person's items are in the cross-clause form. Drafts come f
 | Stretch: 20–30 real clauses from reported judgments | Amitabh | 6 |
 | **Own defect type** (dev 20, test 100, out-of-scope ~13, fixes) | Each person | about 20 each |
 
-Totals: Avnish about 40 hours, Saksham about 42, Amitabh about 40.
+Totals before the changes of 26 Oct: Avnish about 40 hours, Saksham about 42, Amitabh about 40. With the lawyer contact and pilot runs moved to Saksham, the hours are rebalanced at the first checkpoint after the mid-submission.
 
 ### Dates
 
