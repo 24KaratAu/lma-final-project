@@ -466,9 +466,9 @@ Use this section if the team runs with three people. The legal and data workstre
 
 | Person | Defect type | Dev items | Test items | Out-of-scope items |
 |---|---|---|---|---|
-| Avnish | Restraint of trade (s.27) | 20 | 100 (50 defects, 50 look-alikes) | 14 |
-| Saksham | Bar on legal proceedings (s.28(a), first part) | 20 | 100 (50 defects, 50 look-alikes) | 13 |
-| Amitabh | Time limits (s.28(a) second part, s.28(b)) | 20 | 100 (50 defects, 50 look-alikes) | 13 |
+| Avnish | Restraint of trade (s.27) | 6 in the pilot (✅ done); the other 14 written by Saksham (7) and Amitabh (7) before the mid-submission | 100 (50 defects, 50 look-alikes) | 14 |
+| Saksham | Bar on legal proceedings (s.28(a), first part) | 20 (7 from the pilot + 13 new) | 100 (50 defects, 50 look-alikes) | 13 |
+| Amitabh | Time limits (s.28(a) second part, s.28(b)) | 20 (6 from the pilot + 14 new) | 100 (50 defects, 50 look-alikes) | 13 |
 
 About a third of each person's items are in the cross-clause form. Drafts come from the open-model drafting job on Kaggle (section 9) and are edited by hand.
 
@@ -496,9 +496,10 @@ Totals before the changes of 26 Oct: Avnish about 40 hours, Saksham about 42, Am
 
 | When | What |
 |---|---|
-| Mon 26 Oct | Pilot done (Avnish) |
-| Tue 27 or Wed 28 Oct | Lawyer session 1: types, look-alikes, checklists, the two questions, 20 pilot clauses, list of rulings |
-| Thu 29 Oct | Dev set: 20 items each, merged and sent to the lawyer as Batch A |
+| Mon 26 Oct | ✅ Pilot clauses, answer key and lawyer labels done (Avnish) |
+| Tue 27 Oct | Pilot model runs and counting (Saksham) |
+| ✅ Mon 26 Oct | Lawyer session 1: types, look-alikes, checklists, the two questions, 20 pilot clauses, list of rulings |
+| Thu 29 Oct | Dev set: the 20 pilot items plus 41 new ones from Saksham (20) and Amitabh (21), merged and sent to the lawyer as Batch A by Saksham |
 | Sat 31 Oct – Tue 3 Nov | Test items sent to the lawyer in batches of about 50 as each person finishes them; all 340 by Tue 3 Nov |
 | Thu 5 Nov | Lawyer session 2: disagreements and ruling summaries |
 | Fri 6 Nov | Test set frozen and tagged `test-v1` |
