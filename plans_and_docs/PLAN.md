@@ -47,8 +47,8 @@ These come straight from the TA's second feedback. Nothing in section 5 starts u
 
 | # | Gate | Owner | Done when |
 |---|---|---|---|
-| 1 | **Pilot on five leases** | Prabhav + Avnish | Misses and false alarms counted for two frontier models on about 12 planted defects and 8 look-alikes |
-| 2 | **Validator decision** | Prabhav | Either a named lawyer has agreed, or the team records "two-member labelling" as the official method. Hard deadline Mon 26 Oct |
+| 1 | **Pilot on five leases** | Prabhav + Avnish | Misses and false alarms counted for two frontier models on about 12 planted defects and 8 look-alikes<br>**Partly done by Avnish (originally Prabhav's work):** five leases collected, 20 clauses planted, answer key written, lawyer's blind labels in (20/20 agree). Model runs and counting still to do. |
+| 2 | **Validator decision** | Prabhav | Either a named lawyer has agreed, or the team records "two-member labelling" as the official method. Hard deadline Mon 26 Oct<br>✅ **Done by Avnish (originally Prabhav's work):** a lawyer has agreed and labels blind (`docs/legal/`). |
 | 3 | **Kaggle smoke test** | Amitabh | A 7–8B model loads in 4-bit and generates on a Kaggle T4; a 20-step QLoRA run completes (section 9) |
 
 **If the pilot shows no misses and no false alarms:** stop and meet. The fallback in the proposal applies: weight the project on the small-model question and on cross-clause items, and make the planted defects subtler.
@@ -59,11 +59,11 @@ These come straight from the TA's second feedback. Nothing in section 5 starts u
 
 | TA point | What we do | Owner | By |
 |---|---|---|---|
-| 1. Legal validator | Gate 0, item 2 | Prabhav | Mon 26 Oct |
+| 1. Legal validator | Gate 0, item 2 | Prabhav<br>✅ Done by Avnish (originally Prabhav's work) | Mon 26 Oct |
 | 2. Trial generation first | Generate 100 training pairs, run the rule checks, report the rejection rate and the reasons before generating more | Amitabh | Thu 29 Oct |
-| 3. Pilot first | Gate 0, item 1 | Prabhav + Avnish | Mon 26 Oct |
+| 3. Pilot first | Gate 0, item 1 | Prabhav + Avnish<br>Partly done by Avnish (originally Prabhav's share); model runs still to do | Mon 26 Oct |
 | 4. How graph edges are built | Section 7 below | Saksham + Prabhav | Tue 27 Oct |
-| 5. Elements per defect type | Section 6 below, signed off by the lawyer | Prabhav | Wed 28 Oct |
+| 5. Elements per defect type | Section 6 below, signed off by the lawyer | Prabhav<br>Lawyer review obtained by Avnish (originally Prabhav's work, `docs/legal/session1_review.md`); section 6 still to be updated with the corrections | Wed 28 Oct |
 
 Avnish sends the TA a one-page note with these answers by Wed 28 Oct, and the same answers go into the mid-submission.
 
@@ -127,7 +127,7 @@ Each phase ends in a checkpoint on the evening shown: merge to `main`, run the f
 
 | Person | Work |
 |---|---|
-| Prabhav | Contact the lawyer today and ask for three short sessions (section 8); if there is no yes by Mon 26, record two-member labelling as the method. Collect the first five leases. Plant defects and run the pilot with Avnish. |
+| Prabhav | Contact the lawyer today and ask for three short sessions (section 8); if there is no yes by Mon 26, record two-member labelling as the method. Collect the first five leases. Plant defects and run the pilot with Avnish.<br>**Done by Avnish (originally Prabhav's work):** ✅ lawyer contacted and agreed; ✅ five leases collected (`data/pilot/leases/`, `data/sources.csv`); ✅ defects planted (`data/pilot/planted/`). Pilot model runs still to do. |
 | Saksham | Parse the India Code PDF of the Contract Act into section, exception, explanation and illustration nodes. |
 | Amitabh | Get all four Kaggle accounts phone-verified today, which GPU and internet access need (section 9). Kaggle smoke test. Kaggle runner notebook. `generate()` wrapper with `hf`, `claude_cli` and `mock` backends. Keep the Ada request going in parallel; write the Slurm templates only once access lands. |
 | Avnish | Private repo, branch rules, schemas, fixtures (1 lease, 10 items, 8 statute nodes), a test that runs on them, all by Sun 25. Pilot with Prabhav. |
@@ -136,7 +136,7 @@ Each phase ends in a checkpoint on the evening shown: merge to `main`, run the f
 
 | Person | Work | Done when |
 |---|---|---|
-| Prabhav | Lawyer session 1: element checklists and look-alikes. Collect 15–20 leases as clean text. Write the **dev set of 60 items**; the pilot leases and items go into it. | Dev set merged by Thu 29; element sheet signed off |
+| Prabhav | Lawyer session 1: element checklists and look-alikes. Collect 15–20 leases as clean text. Write the **dev set of 60 items**; the pilot leases and items go into it.<br>**Done by Avnish (originally Prabhav's work):** ✅ lawyer session 1 (`docs/legal/session1_review.md`); 8 of 15–20 leases collected (5 pilot, 3 spare). Dev set not started. | Dev set merged by Thu 29; element sheet signed off |
 | Saksham | Statute graph with parsed and regex edges. Lease parser: clauses, definitions, cross-references. Embedding index. **Flat top-k retrieval.** Frontier baseline script (B2) through Claude Code print mode. | Section recall@5 reported on dev; B2 predictions on dev |
 | Amitabh | Few-shot baseline (B1) on dev. Choose two or three base models that fit a 16 GB T4 in 4-bit, noting which also fit 11 GB in case Ada arrives. **Trial of 100 generated pairs** with rule checks. Run the item-drafting job on Kaggle for Prabhav. | B1 numbers; rejection-rate note; first item drafts handed over |
 | Avnish | **Evaluation harness**: every metric in the proposal, from a `preds.jsonl`. Element-check prompts for the three types. **First ablation on dev:** the base model with no retrieval against flat retrieval. Assembles the mid-submission. | Harness scores B1 and B2 on dev; mid-submission sent Fri 30 |
@@ -148,7 +148,7 @@ All Phase 1 GPU work runs on Kaggle and does not wait for Ada.
 | Required | What we submit | Owner |
 |---|---|---|
 | Progress | Gate 0 outcomes, which components are merged and working end to end | Avnish |
-| Datasets | Lease sources (`data/sources.csv`), the 60-item dev set, statute graph node and edge counts, element checklists (section 6) | Prabhav, Saksham |
+| Datasets | Lease sources (`data/sources.csv`), the 60-item dev set, statute graph node and edge counts, element checklists (section 6) | Prabhav, Saksham<br>`data/sources.csv` done by Avnish (originally Prabhav's work) |
 | Baselines | B1 (few-shot open model) and B2 (frontier model) on dev | Amitabh, Saksham |
 | Ablations | No retrieval against flat retrieval on dev | Avnish |
 | Results | Pilot misses and false alarms, flat recall@5, B1 and B2 scores, trial-generation rejection rate | Everyone, collected by Avnish |
@@ -254,7 +254,7 @@ Three short sessions keep the ask small. Offer acknowledgement in the report, wi
 
 | Session | When | Ask | Time needed |
 |---|---|---|---|
-| 1 | by Wed 28 Oct | Confirm the three defect types, the look-alikes and the element checklists in section 6. Suggest 15–20 leading rulings on Sections 27 and 28. | about 45 minutes |
+| 1 | by Wed 28 Oct<br>✅ Done 26 Oct by Avnish (originally Prabhav's work) | Confirm the three defect types, the look-alikes and the element checklists in section 6. Suggest 15–20 leading rulings on Sections 27 and 28. The lawyer also labelled the 20 pilot clauses blind. | about 45 minutes |
 | 2 | by Tue 3 Nov | Yes or no on a 40-item sample: is the verdict right, is the provision right. | about 1 hour |
 | 3 | by Thu 5 Nov, before the freeze | As many of the remaining test items as they can do, hardest first (cross-clause and look-alikes). | 2–3 hours |
 
