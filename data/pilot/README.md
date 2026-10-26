@@ -15,7 +15,17 @@ Five real, executed Indian commercial lease deeds for the pilot (PLAN.md section
 
 **What was done to them:** HTML converted to plain text and the filing headers removed. The wording of the deeds is unchanged. Original downloads are kept locally in `data/raw/`, which git ignores.
 
-**Not yet done (by hand, no AI):**
-1. Read each lease and note any clause that is already void, before planting anything.
-2. Plant the defects and look-alikes in copies of these files, never in the originals here.
-3. Write and commit the sealed answer key before the first model run.
+## Pilot files
+
+| File | What it is |
+|---|---|
+| `leases/` | The five pilot deeds and three spares, as collected. Never edited. |
+| `planted/` | Copies of P01–P05 with 20 clauses written in by hand. |
+| `items.csv` | Where each of the 20 clauses sits (lease and clause number). |
+| `answer_key.jsonl` | The team's answer for each clause, in the labelled-item format. |
+| `../../docs/legal/pilot_answers.csv` | The lawyer's blind answers, with reasons. |
+| `../../docs/legal/session1_review.md` | The lawyer's Session 1 review of the types, rules and judgments. |
+
+The answer key and the lawyer's answers were committed together on 26 Oct 2026. They agree on all 20 verdicts and all 20 sections.
+
+**Still to do:** run the two frontier models on `planted/` (fresh chat per lease, same neutral prompt), save every raw answer, and count misses and false alarms against `answer_key.jsonl`.
