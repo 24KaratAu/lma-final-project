@@ -1,0 +1,33 @@
+{
+  "_note": "Training-pair generation config. Committed before any test item is written (PLAN.md section 13, 'Rules that change'). Family codes follow the pilot answer key; descriptions are inferred from it and must match what the item writers mean. Held-out families are never generated.",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "backend": "vllm",
+  "vllm_kw": {"tensor_parallel_size": 2},
+  "seed": 0,
+  "temperature": 0.9,
+  "max_new_tokens": 700,
+  "cross_share": 0.33,
+  "clause_words": [15, 300],
+  "families": {
+    "restraint_trade": [
+      {"id": "RT-1", "desc": "tenant barred from a similar trade or business within some area for a period after the lease ends", "verdicts": ["void"]},
+      {"id": "RT-2", "desc": "tenant may use the premises only for a stated purpose during the term", "verdicts": ["valid"]},
+      {"id": "RT-3", "desc": "restraint given on assignment or sale of the business together with its goodwill", "verdicts": ["handoff"]},
+      {"id": "RT-4", "desc": "tenant barred from running a competing business elsewhere while the lease runs (e.g. a radius clause in a turnover-rent retail lease)", "verdicts": ["handoff"]},
+      {"id": "RT-5", "desc": "landlord will not let other units in the building to the tenant's competitors", "verdicts": ["valid", "handoff"], "held_out": true}
+    ],
+    "bar_proceedings": [
+      {"id": "BP-1", "desc": "one party's decision, computation or certificate is final and cannot be questioned in any court or forum", "verdicts": ["void"]},
+      {"id": "BP-2", "desc": "disputes referred to arbitration under the Arbitration and Conciliation Act, 1996", "verdicts": ["valid"]},
+      {"id": "BP-3", "desc": "courts of a named city alone have jurisdiction", "verdicts": ["valid", "handoff"], "held_out": true}
+    ],
+    "time_limit": [
+      {"id": "TL-1", "desc": "claims barred unless a suit or claim is brought within a period shorter than the limitation period", "verdicts": ["void"]},
+      {"id": "TL-2", "desc": "a party must give notice, cure a breach or pay within a period, with no loss of the right to sue", "verdicts": ["valid"]},
+      {"id": "TL-4", "desc": "a right is deemed waived or extinguished, or a party discharged from liability, if not exercised within a period", "verdicts": ["void"], "held_out": true}
+    ],
+    "out_of_scope": [
+      {"id": "OOS-1", "desc": "an ordinary lease clause unrelated to ss.27-28: rent, maintenance, stamp duty, insurance, or a cap on liability", "verdicts": ["handoff"]}
+    ]
+  }
+}
