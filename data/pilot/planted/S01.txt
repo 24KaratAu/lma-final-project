@@ -67,6 +67,12 @@ acknowledges. The Parties agree that the total security deposit of Rs.5,94,000/-
 Lessor interest free, on expiry of the Lease and on receiving vacant possession of the Schedule Property. The Lessee shall be entitled to interest at the rate of 10% per annum in case of any delay in the repayment of the security deposit.
 Interest shall be payable from the date on which the same is due till the same is repaid in full. 
 
+(c)
+The obligation of the Lessor to refund the Security Deposit under sub-clause (b) above shall be conditional upon the Lessee serving a Refund Claim Notice on the Lessor. If no Refund Claim Notice is served, the right of the Lessee to the refund of the Security Deposit or any part thereof shall stand extinguished and the Lessor shall stand discharged from all liability in respect thereof.
+
+(d)
+Any claim of the Lessee for interest on delayed repayment of the Security Deposit under sub-clause (b) above shall be enforceable only if the Lessee, within fifteen (15) days of receiving the refund of the Security Deposit, delivers to the Lessor a written statement of the interest claimed together with its computation. On the expiry of the said fifteen days without such statement having been delivered, the claim of the Lessee for such interest shall stand extinguished.
+
 4.
 Term of Lease and Renewal: The Lease shall be for a period of 2 (two) years until (and inclusive of) 15 October 2007, with an option to the Lessee for renewal for
 such further period by execution of a fresh Deed, with such similar terms and conditions as contained herein. The Lessee shall communicate any request for such renewal to the Lessor in writing. Upon receipt of the Lessee’s intimation to renew
@@ -183,6 +189,9 @@ obliged to pay any charges, rates or rents in respect of any of the services tha
 The Lessor shall, at all times, continue to be a member of any association formed by the owners of all units situated in the building of which the Schedule Property is a part, so
 that upon payment of applicable charges, the Lessee may enjoy the benefits of common areas and other facilities administered and provided by such association. 
 
+(l)
+The Lessor shall not, during the term of this Deed and any renewal thereof, let out, license or otherwise permit the use of any other unit owned by him in Raheja Towers to any person engaged in the business of development, sale or marketing of electronic design automation software.
+
 9.
 Rights and Obligations of Lessee: 
 
@@ -272,6 +281,9 @@ be permitted ingress and egress from the building in which the Schedule Property
 The Lessee shall be entitled to put-up and display a signboard of appropriate dimensions and at the appropriate locations in accordance with any rules commonly prescribed from time
 to time for all occupants of the building of which the Schedule Property is a part. 
 
+
+(n)
+Any claim of the Lessee for recovery of the cost of major repairs attended to by the Lessee under sub-clause (d) of this Clause 9(I), or of any sum paid by the Lessee under sub-clause (e) of this Clause 9(I), which is not raised by the Lessee in writing within sixty (60) days of the completion of such repairs or the making of such payment, shall be deemed to have been waived by the Lessee, and the Lessor shall stand discharged from any liability to reimburse the same.
 (II) The Lessee shall
 discharge the following obligations: 
 
@@ -311,6 +323,9 @@ RTOSOA, formed for the upkeep and welfare of such building.
 The Lessee agrees to observe any regulation lawfully prescribed by the RTOSOA as referred to above in accordance with its bye-laws for all occupants in the building of which the
 Schedule Property is a part. 
 
+(i)
+The Lessee shall not, during the Restricted Period, carry on or be engaged or concerned in, whether directly or through any subsidiary, holding company or company under the same management, the business of development, sale or marketing of software from any premises situated within the Restricted Area.
+
 10.
 Termination: 
 
@@ -336,6 +351,9 @@ Rs. 5,94,000/- (Rupees five lakhs ninety four thousand only) together with inter
 
 10 
 
+(f)
+A party alleging that the other party has committed a default of the nature referred to in sub-clause (c) of this Clause 10 shall institute legal proceedings in respect of such default within three (3) months from the expiry of the forty-five day period referred to therein, failing which such party shall be precluded from enforcing any remedy whatsoever in respect of such default.
+
 11.
 Notices: Any notice to either of the parties herein shall be deemed to be properly served if sent to such party by registered post to the address provided in this Deed
 above or to such other address as may be designated by the parties and in the case of the Lessee a copy of the notice shall also be sent to the main offices of the Lessee at Unit 2, 3rd Floor, Innovator, ITPL, Whitefield Road, Bangalore – 560 066 and shall be addressed to the Managing Director or to such other address / person as may be
@@ -350,6 +368,9 @@ Arbitration and Jurisdiction: In case of any dispute between the parties arising
 enjoyment of the Schedule Property by the Lessee, or the lease of the Schedule Property, which cannot be amicably settled by the parties by mutual discussions, such disputes shall be referred to arbitration by a sole arbitrator to be mutually
 appointed by the parties in accordance with the provisions of Arbitration and Conciliation Act 1996 or any modifications or re-enactments thereof. The law governing the arbitration proceedings shall be Indian Law and the proceedings shall be held at
 Bangalore and conducted in the English language. Subject to the above, any action for obtaining any injunctive orders shall be subject to the exclusive jurisdiction of the courts in Bangalore City. 
+
+13A.
+Limitation of Claims: Notwithstanding anything contained in Clause 13, the Lessee shall not be entitled to commence any suit or other legal proceeding against the Lessor in respect of any matter arising out of or in connection with this Deed unless such suit or proceeding is instituted within six (6) months from the date on which the cause of action first arose, and any suit or proceeding instituted after the expiry of the said period shall stand barred.
 
 14.
 Expenses of this Deed and possession thereof: The parties shall respectively bear and pay the respective charges for the solicitors engaged by them and pertaining to
@@ -376,6 +397,16 @@ party to comply strictly with the provisions hereof, whether for the same or for
 (d)
 Entire Agreement: This instrument constitutes the entire agreement between the parties as to the subject matter hereof and supersedes all previous agreements or
 understandings, if any, with respect thereto. 
+
+15A.
+Interpretation: In this Deed, unless the context otherwise requires:
+
+15A.1
+"Refund Claim Notice" means a written notice from the Lessee to the Lessor, sent by registered post to the address of the Lessor under Clause 11, specifying the amount of the Security Deposit claimed by the Lessee, and delivered to the Lessor within thirty (30) days from the date on which vacant possession of the Schedule Property is handed over to the Lessor.
+
+15A.2
+"Restricted Area" means the area lying within a radius of two (2) kilometres of Raheja Towers, Mahatma Gandhi Road, Bangalore, and "Restricted Period" means the period of eighteen (18) months commencing on the date of expiry or earlier termination of this Deed.
+
 
 SCHEDULE 
  
