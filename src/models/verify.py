@@ -29,7 +29,8 @@ existing disputes). Choosing one court that already has jurisdiction (e.g. where
 court whose jurisdiction cannot be told from the lease: handoff.
 - time_limit (s.28(a) second limb and s.28(b), ICA-28): a clause shortening the time to sue, or saying a right is \
 extinguished, waived or forfeited, or a party discharged, once a period ends, is void. A period that only governs a \
-contractual step (notice, cure, payment) with no such consequence is valid.
+contractual step (notice, cure, payment) with no such consequence is valid, and so is a time to sue of three years or \
+more (no shorter than the Limitation Act allows).
 - Anything else (rent, maintenance, caps on liability, stamp duty...) is out_of_scope: verdict handoff, provision null."""
 
 SHOTS = [
@@ -138,11 +139,9 @@ def rule_verdict(defect_type: str, el: dict) -> str | None:
         return "handoff" if el.get("degree") == "partial" else None
     if defect_type == "time_limit":
         # Bank guarantee (Exception 3) is ignored: a lease clause is never the bank's own guarantee (lawyer, session 1).
-        if el.get("what_is_limited") == "time_to_sue" or el.get("effect_on_expiry") in ("claim_barred", "right_extinguished"):
-            return "void"
-        if el.get("what_is_limited") == "contractual_step" and el.get("effect_on_expiry") == "none":
-            return "valid"
-        return None
+        # A time to sue of at least the statutory period has no effect on the right to sue (effect "none"): valid.
+        effect = el.get("effect_on_expiry")
+        return {"claim_barred": "void", "right_extinguished": "void", "none": "valid"}.get(effect)
     return None
 
 
