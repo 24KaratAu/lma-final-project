@@ -37,7 +37,8 @@ def _commit() -> str:
     try:
         return subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
     except (OSError, subprocess.CalledProcessError):
-        return "unknown"
+        # Kaggle copy made with `git archive --add-virtual-file=COMMIT:<hash>` has no .git
+        return Path("COMMIT").read_text().strip() if Path("COMMIT").exists() else "unknown"
 
 
 def _no_retrieval(clause_id, lease, mode="none", k=5):
