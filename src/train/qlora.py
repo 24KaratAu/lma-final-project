@@ -10,6 +10,7 @@ Writes train_log.json with steps, time and peak GPU memory.
 
 import argparse
 import json
+import math
 import random
 import time
 from pathlib import Path
@@ -88,10 +89,12 @@ def main(argv=None):
             if time.time() - self.last > 1800:
                 control.should_save, self.last = True, time.time()
 
+    # 3% warmup, in steps: transformers 5 dropped warmup_ratio
+    total = args.max_steps if args.max_steps > 0 else math.ceil(len(data) * args.epochs / args.grad_accum)
     targs = TrainingArguments(
         output_dir=str(out), per_device_train_batch_size=1, gradient_accumulation_steps=args.grad_accum,
         num_train_epochs=args.epochs, max_steps=args.max_steps, learning_rate=args.lr, lr_scheduler_type="cosine",
-        warmup_ratio=0.03, fp16=True, logging_steps=5, save_steps=args.save_steps, save_total_limit=2,
+        warmup_steps=max(1, int(0.03 * total)), fp16=True, logging_steps=5, save_steps=args.save_steps, save_total_limit=2,
         gradient_checkpointing=True, report_to=[], seed=args.seed,
     )
     trainer = Trainer(model=net, args=targs, train_dataset=data, data_collator=collate, callbacks=[SaveEvery30Min()])
