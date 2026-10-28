@@ -99,7 +99,9 @@ def main(argv=None):
     )
     trainer = Trainer(model=net, args=targs, train_dataset=data, data_collator=collate, callbacks=[SaveEvery30Min()])
 
-    torch.cuda.reset_peak_memory_stats()
+    gpus = range(torch.cuda.device_count())  # device_map="auto" can spread the model over both T4s
+    for i in gpus:
+        torch.cuda.reset_peak_memory_stats(i)
     start = time.time()
     trainer.train(resume_from_checkpoint=get_last_checkpoint(str(out)))
     trainer.save_model(str(out / "adapter"))
@@ -110,7 +112,8 @@ def main(argv=None):
         "longest_input_tokens": max(len(d["input_ids"]) for d in data),
         "steps": trainer.state.global_step,
         "minutes": round((time.time() - start) / 60, 2),
-        "peak_gpu_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2),
+        "peak_gpu_gb": round(sum(torch.cuda.max_memory_allocated(i) for i in gpus) / 2**30, 2),
+        "peak_gpu_gb_per_gpu": [round(torch.cuda.max_memory_allocated(i) / 2**30, 2) for i in gpus],
         "gpu": torch.cuda.get_device_name(0),
         "final_loss": next((h["loss"] for h in reversed(trainer.state.log_history) if "loss" in h), None),
     }
