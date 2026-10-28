@@ -1,7 +1,7 @@
 {
   "_note": "Training-pair generation config. Committed before any test item is written (PLAN.md section 13, 'Rules that change'). Family codes follow the pilot answer key; descriptions are inferred from it and must match what the item writers mean. Held-out families are never generated.",
   "model": "Qwen/Qwen2.5-7B-Instruct",
-  "backend": "vllm",
+  "backend": "hf",
   "vllm_kw": {"tensor_parallel_size": 2},
   "seed": 0,
   "temperature": 0.9,
