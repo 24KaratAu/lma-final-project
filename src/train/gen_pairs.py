@@ -127,7 +127,7 @@ def main(argv=None):
     specs = sample_specs(cfg, args.n)
     raws = generate(
         [gen_prompt(s) for s in specs], cfg["model"], backend=args.backend or cfg["backend"],
-        temperature=cfg["temperature"], max_new_tokens=cfg["max_new_tokens"], seed=cfg["seed"], vllm_kw=cfg.get("vllm_kw"),
+        temperature=cfg["temperature"], max_new_tokens=cfg["max_new_tokens"], seed=cfg["seed"], batch_size=cfg.get("batch_size", 4),
     )
 
     kept, rejected, reasons, seen = [], [], Counter(), set()

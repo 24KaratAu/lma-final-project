@@ -1,7 +1,7 @@
 """Run the pipeline over a labelled set, log the run, and score it (PLAN.md section 11).
 
 python -m src.eval.run --items data/dev/items.jsonl --leases data/leases \
-    --model Qwen/Qwen2.5-7B-Instruct --backend vllm --mode none --out runs
+    --model Qwen/Qwen2.5-7B-Instruct --backend hf --mode none --out runs
 
 Writes runs/<run_id>/config.json, preds.jsonl and metrics.json. Predictions
 are appended as each lease finishes, so a rerun with the same --run-id
@@ -50,7 +50,7 @@ def main(argv=None):
     ap.add_argument("--items", required=True)
     ap.add_argument("--leases", required=True)
     ap.add_argument("--model", required=True)
-    ap.add_argument("--backend", default="hf", choices=["hf", "vllm", "claude_cli", "mock"])
+    ap.add_argument("--backend", default="hf", choices=["hf", "claude_cli", "mock"])
     ap.add_argument("--mode", default="none", choices=["none", "flat", "graph"])
     ap.add_argument("--k", type=int, default=5)
     ap.add_argument("--seed", type=int, default=0)

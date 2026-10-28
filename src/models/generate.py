@@ -1,6 +1,7 @@
 """generate(): one entry point for every model backend (PLAN.md section 4).
 
-Backends: hf (transformers, 4-bit), vllm, claude_cli, mock. GPU libraries are
+Backends: hf (transformers, 4-bit), claude_cli, mock. vLLM was dropped: its builds
+need CUDA 13 or newer GPUs than Kaggle's T4s (smoke test, 29 Oct). GPU libraries are
 imported only when their backend is used, so the mock runs anywhere.
 """
 
@@ -17,15 +18,12 @@ def generate(prompts: list[str], model: str, backend: str = "hf", **kw) -> list[
     """Answer each prompt with `model`.
 
     kw: max_new_tokens (512), temperature (0 = greedy), seed (0), batch_size (hf, 4),
-        adapter (path to a LoRA adapter; hf and vllm), system (claude_cli system prompt),
-        vllm_kw (extra vllm.LLM arguments, e.g. {"tensor_parallel_size": 2} for a 7B model on two T4s).
+        adapter (path to a LoRA adapter; hf), system (claude_cli system prompt).
     """
     if backend == "mock":
         return mock_generate(prompts, model)
     if backend == "hf":
         return _hf(prompts, model, **kw)
-    if backend == "vllm":
-        return _vllm(prompts, model, **kw)
     if backend == "claude_cli":
         return _claude_cli(prompts, model, **kw)
     raise ValueError(f"unknown backend {backend!r}")
@@ -74,25 +72,6 @@ def _load_hf(model, adapter=None):
 
 def _chat(tok, prompt):
     return tok.apply_chat_template([{"role": "user", "content": prompt}], tokenize=False, add_generation_prompt=True)
-
-
-def _vllm(prompts, model, max_new_tokens=512, temperature=0.0, seed=0, adapter=None, vllm_kw=None, **_):
-    from vllm import LLM, SamplingParams
-
-    key = ("vllm", model, adapter)
-    if key not in _loaded:
-        llm_kw = {"dtype": "half", "seed": seed, "enable_lora": bool(adapter), "max_model_len": 4096} | (vllm_kw or {})
-        _loaded[key] = LLM(model=model, **llm_kw)
-    llm = _loaded[key]
-    lora = None
-    if adapter:
-        from vllm.lora.request import LoRARequest
-
-        lora = LoRARequest("adapter", 1, adapter)
-    tok = llm.get_tokenizer()
-    params = SamplingParams(temperature=temperature, max_tokens=max_new_tokens, seed=seed)
-    outs = llm.generate([_chat(tok, p) for p in prompts], params, lora_request=lora)
-    return [o.outputs[0].text for o in outs]
 
 
 def _claude_cli(prompts, model, system=None, **_):
