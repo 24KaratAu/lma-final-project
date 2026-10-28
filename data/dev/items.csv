@@ -1,0 +1,22 @@
+item_id,lease_id,clause
+DA-01,S01,cl. 13A
+DA-02,S01,cl. 3(c)
+DA-03,S01,cl. 9(I)(n)
+DA-04,S01,cl. 10(f)
+DA-05,S01,cl. 3(d)
+DA-06,S01,cl. 9(II)(i)
+DA-07,S01,cl. 8(l)
+DA-08,S02,"Exhibit A, GTC-42A"
+DA-09,S02,"Exhibit A, GTC-3(d)"
+DA-10,S02,"Exhibit A, GTC-12A"
+DA-11,S02,"Exhibit A, GTC-25(d)"
+DA-12,S02,"Exhibit A, GTC-13(g)"
+DA-13,S02,"Exhibit A, GTC-15A"
+DA-14,S02,"Exhibit A, GTC-12B"
+DA-15,S03,cl. 3(c)
+DA-16,S03,cl. 2(g)
+DA-17,S03,cl. 1(i)
+DA-18,S03,cl. 3(e)
+DA-19,S03,cl. 2(h)
+DA-20,S03,cl. 1(j)
+DA-21,S03,cl. 1(k)

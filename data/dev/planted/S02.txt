@@ -462,7 +462,7 @@ GTC-3: ELECTRICITY
  shall provide with separate electricity sub -meter for the
  Demised Premises during the Lease period.
 
-(d) The Lessee may dispute the amount of any electricity bill raised by the Lessor under sub-clause (c) above only after paying the full amount of such bill under protest within the Protest Window. If payment under protest is not made within the Protest Window, such bill shall be final and binding on the Lessee and the right of the Lessee to dispute, or to recover, any amount charged under it shall stand extinguished.
+(d) The Lessee shall pay the full amount of any electricity bill raised by the Lessor under sub-clause (c) above within the Protest Window, under protest if the Lessee disputes the amount, without prejudice to the right of the Lessee to dispute, or to recover, any amount so paid.
 
 GTC-4: WATER
 
@@ -1466,7 +1466,7 @@ period of arbitration.
 
 GTC-42A: LIMITATION OF CLAIMS
 
-Notwithstanding GTC-42, no claim of the Lessee against the Lessor arising out of or in connection with this Lease shall be enforceable by any suit, petition or other legal proceeding unless such proceeding is commenced within one (1) year from the date of expiry or earlier termination of this Lease, and upon the lapse of the said period every such claim shall be absolutely barred.
+Notwithstanding GTC-42, no claim of the Lessee against the Lessor arising out of or in connection with this Lease shall be enforceable by any suit, petition or other legal proceeding unless such proceeding is commenced within three (3) years from the date of expiry or earlier termination of this Lease, and upon the lapse of the said period every such claim shall be absolutely barred.
 
 GTC-43: PRONOUNS
 
@@ -1678,6 +1678,6 @@ the Building Premises described above.
 
 E.1 "Protest Window" means the period of seven (7) days commencing on the date of receipt by the Lessee of any electricity bill raised by the Lessor under GTC-3(c) of Exhibit 'A'.
 
-E.2 "Limitation Date" means, in relation to any claim, the date falling one hundred and twenty (120) days after the date of the act, omission or event giving rise to that claim.
+E.2 "Limitation Date" means, in relation to any claim, the date falling three (3) years after the date of the act, omission or event giving rise to that claim.
 
 E.3 "Competing Facility" means any office, development centre or other premises situated in the Madhapur, Gachibowli or Kondapur areas of Hyderabad, other than the Building Premises, which is owned or leased by any person other than the Lessor.
