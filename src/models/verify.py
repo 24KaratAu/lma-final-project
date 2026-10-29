@@ -57,14 +57,15 @@ SHOTS = [
 ]
 
 
-def element_sheet() -> str:
+def element_sheet(only: str | None = None) -> str:
     lines = []
     for dtype, elements in ELEMENTS.items():
-        if not elements:
+        if not elements or (only and dtype != only):
             continue
-        lines.append(f"{dtype}:")
+        if not only:
+            lines.append(f"{dtype}:")
         for name, values in elements.items():
-            lines.append(f"  {name}: {' | '.join(sorted(values)) if values else 'free text'}")
+            lines.append(f"{'' if only else '  '}{name}:{' | '.join(sorted(values)) if values else 'free text'}")
     return "\n".join(lines)
 
 

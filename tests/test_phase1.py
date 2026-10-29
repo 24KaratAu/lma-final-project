@@ -109,6 +109,9 @@ def test_check_keeps_good_pair_and_rejects_bad_ones():
     assert {"wrong_verdict", "rules_disagree", "bad_provision"} <= set(gen_pairs.check(spec, json.dumps(bad), set(), CFG)[1])
     assert gen_pairs.check(spec | {"form": "cross"}, json.dumps(good), set(), CFG)[1] == ["cross_without_definition"]
     assert gen_pairs.check(spec, "garbage", set(), CFG)[1] == ["unparseable"]
+    nested = good | {"elements": {"time_limit": good["elements"]}}  # how Qwen answered in the first trial
+    assert gen_pairs.check(spec, json.dumps(nested), set(), CFG)[1] == []
+    assert "restrained_party" not in gen_pairs.gen_prompt(spec) and '"ICA-28" or "ICA-28-E3"' in gen_pairs.gen_prompt(spec)
 
     prompt, target = gen_pairs.to_example(pair)
     assert pair["clause"] in prompt and parse_answer(target)["verdict"] == "void"

@@ -49,15 +49,23 @@ def gen_prompt(spec: dict) -> str:
         if spec["form"] == "cross"
         else "The clause must be understandable on its own; leave `definitions` empty."
     )
+    dtype = spec["defect_type"]
+    if dtype == "out_of_scope":
+        elements, provision = "Leave `elements` empty: {}.", "null"
+    else:
+        # Only this type's elements, flat; the full sheet made the model nest them under type names.
+        elements = "Elements, as a flat object (use exactly these names and values):\n" + element_sheet(dtype)
+        provision = '"' + '" or "'.join(sorted(PROVISIONS[dtype])) + '"'
     return "\n\n".join(
         [
             "Write one clause of an Indian commercial lease deed, in the style of a real registered deed "
             "(vary between older formal drafting and modern corporate drafting; vary names, places, numbers).",
-            f"Kind of clause: {spec['desc']}.\nDefect type: {spec['defect_type']}.\nIts correct verdict must be: {spec['verdict']}.\n{cross}",
+            f"Kind of clause: {spec['desc']}.\nDefect type: {dtype}.\nIts correct verdict must be: {spec['verdict']}.\n{cross}",
             RULES,
-            "Elements (use exactly these names and values):\n" + element_sheet(),
+            elements,
             "Reply with one JSON object only: "
-            '{"clause": "...", "definitions": ["..."], "elements": {...}, "verdict": "...", "provision": "ICA-... or null"}',
+            '{"clause": "...", "definitions": ["..."], "elements": {"name": "value", ...}, "verdict": "...", "provision": ...}'
+            f"\nprovision must be exactly one of: {provision}.",
         ]
     )
 
@@ -77,7 +85,10 @@ def check(spec: dict, raw: str, seen: set, cfg: dict) -> tuple[dict | None, list
     lo, hi = cfg["clause_words"]
     if not lo <= len(clause.split()) <= hi:
         reasons.append("length")
-    elements = {k: str(v) for k, v in (out.get("elements") or {}).items()} if isinstance(out.get("elements"), dict) else {}
+    elements = out.get("elements") if isinstance(out.get("elements"), dict) else {}
+    if isinstance(elements.get(spec["defect_type"]), dict):  # nested under the type name: unwrap
+        elements = elements[spec["defect_type"]]
+    elements = {k: str(v) for k, v in elements.items()}
     try:
         LabelledItem(
             item_id=spec["pair_id"], lease_id="G", clause_id="G-1", defect_type=spec["defect_type"], form=spec["form"],
