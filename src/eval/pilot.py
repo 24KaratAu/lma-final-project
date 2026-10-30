@@ -73,8 +73,10 @@ def main(argv=None):
                 raw_path.write_text(raw, encoding="utf-8")
             lines = deed(lease_id)
             clauses = {it.item_id: cut(lines, *ANCHORS[it.item_id]) for it in items if it.lease_id == lease_id}
+            # Fallback for planted text inside an existing clause (e.g. "cl. 12, last para."), quoted from the clause's start.
+            numbers = {it.clause_id.split("-", 1)[1].upper(): it.item_id for it in items if it.lease_id == lease_id}
             for flag in parse(raw_path.read_text(encoding="utf-8")):
-                item_id = match(str(flag.get("quote", "")), clauses)
+                item_id = match(str(flag.get("quote", "")), clauses) or numbers.get(str(flag.get("clause", "")).strip(" .").upper())
                 if item_id:
                     flagged.add(item_id)
                 else:
