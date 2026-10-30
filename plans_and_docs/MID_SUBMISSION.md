@@ -1,7 +1,7 @@
 # Mid-submission: Team ClosedAI
 
 **Project:** Statute-grounded enforceability checking for Indian commercial leases
-**Date:** Fri 30 Oct 2026 · **Repository tag:** `mid-v1`
+**Date:** Fri 30 Oct 2026 · **Repository:** https://github.com/24KaratAu/lma-final-project (tag `mid-v1`)
 
 All numbers below are on the **dev set** (61 items). The test set is not built yet; it is frozen on Fri 6 Nov and nothing here was tuned on it.
 
