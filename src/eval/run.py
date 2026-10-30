@@ -33,6 +33,16 @@ def _gpu() -> tuple[str, int]:
         return "none", 0
 
 
+def _peak_gb() -> float | None:
+    """Peak GPU memory over all devices, for the base-model choice (fits a 16 GB T4? an 11 GB Ada GPU?)."""
+    try:
+        import torch
+
+        return round(sum(torch.cuda.max_memory_allocated(i) for i in range(torch.cuda.device_count())) / 2**30, 2) or None
+    except ImportError:
+        return None
+
+
 def _commit() -> str:
     try:
         return subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
@@ -99,7 +109,11 @@ def main(argv=None):
         print(f"{lease_id}: {len(preds)} predictions", flush=True)
 
     hours = (time.time() - start) / 3600
-    config |= {"finished": datetime.now(timezone.utc).isoformat(), "gpu_hours_this_session": round(hours * gpu_count, 3)}
+    config |= {
+        "finished": datetime.now(timezone.utc).isoformat(),
+        "gpu_hours_this_session": round(hours * gpu_count, 3),
+        "peak_gpu_gb": _peak_gb(),
+    }
     (run_dir / "config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
 
     result = score(items, read_jsonl(preds_path, Prediction), args.k)
