@@ -99,6 +99,8 @@ def check(spec: dict, raw: str, seen: set, cfg: dict) -> tuple[dict | None, list
         )
     except ValidationError:
         reasons.append("schema")
+    if "free text" in (v.strip().lower() for v in elements.values()):  # copied the sheet instead of filling it in
+        reasons.append("placeholder")
     if out.get("verdict") != spec["verdict"]:
         reasons.append("wrong_verdict")
     by_rules = rule_verdict(spec["defect_type"], elements)
