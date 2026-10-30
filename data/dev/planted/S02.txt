@@ -133,6 +133,14 @@ SECTION 2. DEMISED PREMISES
  said prior commencement date is hereinafter agreed by both parties to be
  construed as the commencement date of this lease deed.
 
+(c) The super built up area of the Demised Premises shall be measured
+ within fifteen (15) days of the Commencement Date by the architect of
+ the Building nominated by the Lessor, and the area so certified by the
+ said architect shall be final and conclusive for the computation of the
+ Rent and the maintenance charges. No suit, arbitration or other
+ proceeding shall lie at the instance of the Lessee in any court or
+ before any tribunal in respect of the area so certified.
+
 SECTION 3. TERM & TERMINATION
 
 (a) This Lease and the parties' respective rights, obligations and
@@ -180,6 +188,12 @@ SECTION 3. TERM & TERMINATION
 
  legal rights of the aggrieved party in respect of such breach by the
  party committing such breach.
+
+(f) In this Lease, "Restricted Period" means the period of twelve (12)
+ months commencing on the Expiration Date or on the date of sooner
+ determination of this Lease, as the case may be; and "Restricted Area"
+ means the Software Units Layout, Madhapur together with the area lying
+ within two (2) kilometres of its boundary.
 
 SECTION 4 RENT
 
@@ -533,6 +547,15 @@ GTC-7: CAFETERIA
  be held only at times when cafeteria is not being used. The Lessee agrees
  to pay the Lessor for such use at mutually agreed rates.
 
+(d) The Lessor has, under a separate agreement of even date, transferred
+ to the Lessee the coffee kiosk business hitherto carried on by the
+ Lessor in the courtyard of the Building Premises, together with the
+ goodwill thereof. In consideration thereof, the Lessor agrees that so
+ long as the Lessee, or any person deriving title to the said goodwill
+ from it, carries on a like business in the said courtyard, the Lessor
+ shall not carry on, or be concerned or interested in, any coffee shop,
+ coffee kiosk or similar business anywhere whatsoever.
+
 GTC-8: PARKING
 
 (a) The Lessor shall provide for common covered parking area to accommodate
@@ -607,6 +630,11 @@ GTC-9: SUSPENSION OF FACILITIES
  days of any proposed suspension of facilities. Lessor shall arrange to
  restore facilities as soon as practicable at the expense of the Lessor.
 
+(c) Lessee shall not be entitled to institute any suit, arbitration or
+ other proceeding against Lessor in respect of any suspension, delay or
+ discontinuance of facilities under this GTC-9, howsoever caused, and no
+ such claim shall be entertained by any court or arbitral tribunal.
+
  /s/ Jayapal Reddy /s/ Manoj Menon
 
  - 7 -
@@ -680,6 +708,12 @@ GTC-11: RENT
  shall not be required to accept a cheque drawn by any other person. Any
  cheque received by Lessor shall be deemed received subject to collection.
 
+(d) Within fifteen (15) days after the end of each calendar quarter, Lessor
+ shall furnish to Lessee a statement of the Reimbursements and maintenance
+ charges payable by Lessee for that quarter, certified by Lessor's Chief
+ Financial Officer (the "Lessor's Certificate"). Lessee shall pay the
+ amount stated in the Lessor's Certificate within ten (10) days of receipt.
+
 GTC-12: SURRENDER OF DEMISED PREMISES
 
 Upon termination of this Lease by lapse of time or otherwise, Lessee shall
@@ -702,11 +736,19 @@ Premises to Lessor at the end of the Term without notice of any kind, and Lessee
 hereby waives all right to any such notice as may be provided under any present
 or future law.
 
-GTC-12A: DEMAND FOR REFUND OF DEPOSIT
+GTC-12A: RESTRICTIVE COVENANT
+
+Lessee covenants that it shall not, during the Restricted Period, either
+directly or through any of its subsidiaries/affiliates, carry on or be
+engaged in the business of software development or Information Technology
+Enabled Services (ITES) from any premises situated within the Restricted
+Area.
+
+GTC-12B: DEMAND FOR REFUND OF DEPOSIT
 
 The Lessee shall, within ninety (90) days from the date of expiry or earlier determination of this Lease, call upon the Lessor in writing to refund the Deposit. On the expiry of the said ninety days without such written demand having been made, the Lessor shall stand discharged from all liability to refund the Deposit or any part thereof, notwithstanding anything contained in GTC-12 or Section 5 of the Lease Deed.
 
-GTC-12B: POST-TERM COVENANT
+GTC-12C: POST-TERM COVENANT
 
 For a period of two (2) years after the Lessee surrenders the Demised Premises, the Lessee shall not take on lease, license or otherwise occupy any office premises within a radius of five (5) kilometres of Plot No. 5, Software Units Layout, Madhapur, for the purpose of carrying on any software or ITES business.
 
@@ -1100,6 +1142,13 @@ GTC-24: THE LESSOR HEREBY COVENANTS WITH THE LESSEE THAT
  assume the obligations and covenants herein on the part of the Lessor to
  be performed.
 
+(h) The Lessor shall not, during the term of this Lease and for a further
+ period of two (2) years after the Expiration Date, let out, license or
+ otherwise permit the use of any other floor or portion of the Building
+ Premises by any person engaged in the business of providing information
+ technology consulting or offshore software services to banks and
+ financial institutions, being the line of business of the Lessee.
+
 GTC-25: WAIVER OF SUBROGATION; INDEMNITY
 
 (a) Except as otherwise set forth in this Lease, Lessor and Lessee hereby
@@ -1464,7 +1513,19 @@ and Conciliation Act, 1996 and the venue of arbitration shall be at Hyderabad.
 All the rights and obligations of Lessee and Lessor will continue during the
 period of arbitration.
 
-GTC-42A: LIMITATION OF CLAIMS
+GTC-42A: CONCLUSIVENESS OF LESSOR'S CERTIFICATE
+
+Notwithstanding anything contained in GTC-42, the amounts stated in a
+Lessor's Certificate shall be final and conclusive between the parties and
+shall not be called in question by Lessee before the arbitral panel, any
+court or any other authority.
+
+GTC-42B: JURISDICTION
+
+Subject to GTC-42, the courts at Pune shall alone have jurisdiction in
+respect of all matters arising out of or relating to this Lease.
+
+GTC-42C: LIMITATION OF CLAIMS
 
 Notwithstanding GTC-42, no claim of the Lessee against the Lessor arising out of or in connection with this Lease shall be enforceable by any suit, petition or other legal proceeding unless such proceeding is commenced within three (3) years from the date of expiry or earlier termination of this Lease, and upon the lapse of the said period every such claim shall be absolutely barred.
 

@@ -1,4 +1,4 @@
-LEASE AGREEMENT
+                                 LEASE AGREEMENT
 
 
 
@@ -120,10 +120,19 @@ e) That the Lessor represents and warrants that he is fully entitled to execute 
 f)   That the Lessor shall not terminate the lease during the initial lease tenure of 02 years.
      However, the lessor may terminate the lease during the renewed / extended period, if
      any, by serving two-months prior notice in writing of its intension to do so;
+g) That if any difference arises between the parties as to whether a repair is a
+     major repair to be effected by the Lessor under sub-clause (a) above, or as to
+     the reasonable cost of any repair carried out by the Lessee under that sub-clause,
+     the matter shall be referred to an Executive Engineer of the Central Public Works
+     Department nominated by the Superintending Engineer, CPWD having jurisdiction over
+     the area, whose decision on the matter shall be final and binding on both parties;
+h) That during the lease period and any extended lease period, the Lessor shall not let
+     out or license any other portion of the said building to any person engaged in the
+     business of construction, operation or maintenance of power transmission systems;
 
 
-g) That if the Lessor does not object in writing to any deduction made by the Lessee from the rent under this Clause 2 on or before the Settlement Date, the Lessor shall be deemed to have accepted such deduction and to have waived all rights to recover the amount so deducted;
-h) That the Lessee shall give the Lessor written notice of any interruption or disturbance of the kind referred to in sub-clause (d) of this Clause 2 within the Notice Period;
+i) That if the Lessor does not object in writing to any deduction made by the Lessee from the rent under this Clause 2 on or before the Settlement Date, the Lessor shall be deemed to have accepted such deduction and to have waived all rights to recover the amount so deducted;
+j) That the Lessee shall give the Lessor written notice of any interruption or disturbance of the kind referred to in sub-clause (d) of this Clause 2 within the Notice Period;
 3.   It is hereby mutually agreed as follows:
 
 
@@ -135,10 +144,24 @@ a) That the Lessee shall be entitled to extend the lease for one more year on th
 b) The Lessor, his authorized agents shall acknowledge and give valid and duly stamped
      receipt for each and every payment made by the Lessee, and such receipts shall be
      conclusive proof of such payment.
-c) That any suit or other legal proceeding by the Lessor against the Lessee for recovery of rent, or of any other sum, or for any other relief under this Deed, shall be instituted within three (3) months from the date on which such rent or sum fell due or the right to such relief arose, and not thereafter;
-d) That "Settlement Date" means the date falling forty-five (45) days after the date on which the Lessee intimates the Lessor in writing of any deduction made by it from the rent;
-e) That the Lessor shall, as security for the refund of the interest free refundable advance, furnish to the Lessee an irrevocable bank guarantee from a scheduled bank for an equal amount, which shall provide that the liability of the bank thereunder shall stand discharged, and all rights of the Lessee thereunder shall stand extinguished, unless a written claim is lodged with the bank within six (6) months from the date of expiry or earlier determination of this lease;
-f) That "Notice Period" means the period of fifteen (15) days commencing on the date on which the Lessee first becomes aware of any interruption or disturbance of its possession of the demised premises;
+c) That any dispute or difference arising between the parties out of or in connection
+     with this lease shall be referred to the sole arbitration of a person to be appointed
+     by the Chairman and Managing Director of POWERGRID. The arbitration shall be
+     conducted under the Arbitration and Conciliation Act, 1996, the venue of the
+     arbitration shall be Kolkata, and the award of the arbitrator shall be final and
+     binding on the parties;
+d) That subject to sub-clause (c) above, the courts within whose local jurisdiction the
+     demised premises are situated shall alone have jurisdiction in all matters arising
+     out of this lease;
+e) That notwithstanding sub-clause (c) above, any claim of the Lessor against the Lessee
+     for arrears of rent, damages or recovery of possession shall be decided by the
+     Regional Grievance Committee of POWERGRID, Eastern Region-II, Kolkata, whose decision
+     shall be final, and the Lessor shall not refer any such claim to arbitration or
+     institute any suit or other proceeding in respect thereof in any court.
+f) That any suit or other legal proceeding by the Lessor against the Lessee for recovery of rent, or of any other sum, or for any other relief under this Deed, shall be instituted within three (3) months from the date on which such rent or sum fell due or the right to such relief arose, and not thereafter;
+g) That "Settlement Date" means the date falling forty-five (45) days after the date on which the Lessee intimates the Lessor in writing of any deduction made by it from the rent;
+h) That the Lessor shall, as security for the refund of the interest free refundable advance, furnish to the Lessee an irrevocable bank guarantee from a scheduled bank for an equal amount, which shall provide that the liability of the bank thereunder shall stand discharged, and all rights of the Lessee thereunder shall stand extinguished, unless a written claim is lodged with the bank within six (6) months from the date of expiry or earlier determination of this lease;
+i) That "Notice Period" means the period of fifteen (15) days commencing on the date on which the Lessee first becomes aware of any interruption or disturbance of its possession of the demised premises;
                           SCHEDULE OF THE PROPERTY
 
 
@@ -175,3 +198,4 @@ mentioned.
 
 
         2.
+

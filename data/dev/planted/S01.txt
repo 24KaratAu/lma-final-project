@@ -68,9 +68,12 @@ Lessor interest free, on expiry of the Lease and on receiving vacant possession 
 Interest shall be payable from the date on which the same is due till the same is repaid in full. 
 
 (c)
-The Lessee shall serve a Refund Claim Notice on the Lessor to enable the Lessor to process the refund of the Security Deposit under sub-clause (b) above.
+The monthly rent under sub-clause (a) above has been computed on a super built-up area of 1,320 (one thousand three hundred and twenty) square feet. If either party disputes the said area, the Schedule Property shall be measured by an independent licensed surveyor jointly appointed by the Lessor and the Lessee, and the area so certified by the surveyor shall be final and binding on the parties, and the rent shall stand adjusted accordingly with effect from 16 October 2005. 
 
 (d)
+The Lessee shall serve a Refund Claim Notice on the Lessor to enable the Lessor to process the refund of the Security Deposit under sub-clause (b) above.
+
+(e)
 The Lessee shall, within fifteen (15) days of receiving the refund of the Security Deposit, deliver to the Lessor a written statement of any interest claimed on delayed repayment under sub-clause (b) above, together with its computation.
 
 4.
@@ -324,6 +327,15 @@ The Lessee agrees to observe any regulation lawfully prescribed by the RTOSOA as
 Schedule Property is a part. 
 
 (i)
+During the term of the lease and any renewal thereof, the Lessee shall not use the Schedule Property or any part thereof as a retail outlet, showroom or training institute, or for the display or sale of goods to members of the public, and shall not admit walk-in customers to the Schedule Property save by prior appointment. 
+
+(j)
+The share of the maintenance and other charges of the RTOSOA referred to in sub-clause (g) above that is attributable to the Schedule Property shall be as computed and certified by the Lessor from time to time, and the Lessee shall pay the same within fifteen days of receipt of the Lessor's certificate. Such certificate shall be binding on the Lessee, without prejudice however to the right of the Lessee to dispute the computation in accordance with Clause 13. 
+
+(k)
+During the term of the lease and any renewal thereof, the Lessee shall not, either by itself or through any of its subsidiaries, holding companies or group companies, take on lease or licence or otherwise occupy any other office space on Mahatma Gandhi Road, Bangalore or in any building within one kilometre of Raheja Towers for the purpose of carrying on the business of development, marketing or sale of software. 
+
+(l)
 The Lessee shall not, during the Restricted Period, carry on or be engaged or concerned in, whether directly or through any subsidiary, holding company or company under the same management, the business of development, sale or marketing of software from any premises situated within the Restricted Area.
 
 10.
@@ -349,9 +361,15 @@ Termination of this Deed shall not affect the rights of the parties that have ve
 On the termination of this lease for whatever reason, the Lessee shall hand over the Schedule Property to the Lessor simultaneously with the Lessor refunding the security deposit of
 Rs. 5,94,000/- (Rupees five lakhs ninety four thousand only) together with interest in case of any delay in refunding. 
 
+(f)
+On the termination of this lease, the Lessor shall inspect the Schedule Property and the inventory set out in the Schedule and assess the cost of making good any damage thereto beyond normal wear and tear, and may deduct the amount so assessed from the security deposit. The assessment of the Lessor shall be final and conclusive, and notwithstanding anything contained in Clause 13, the Lessee shall not call the same in question in any arbitration, suit or other proceeding whatsoever. 
+
+(g)
+In consideration of the Lessor having agreed to renew the lease at the rent set out in Clause 3, the Lessee agrees that for a period of two years from the date on which it hands over possession of the Schedule Property to the Lessor, it shall not, either by itself or through any of its subsidiaries, holding companies or group companies, carry on the business of development of software from any premises in Raheja Towers or elsewhere on Mahatma Gandhi Road, Bangalore. 
+
 10 
 
-(f)
+(h)
 A party alleging that the other party has committed a default of the nature referred to in sub-clause (c) of this Clause 10 shall institute legal proceedings in respect of such default within three (3) months from the expiry of the forty-five day period referred to therein, failing which such party shall be precluded from enforcing any remedy whatsoever in respect of such default.
 
 11.
@@ -362,6 +380,9 @@ notified.
 12.
 Amendments/Variations: No change, variation or modification of any of the terms and conditions set forth herein shall be valid unless incorporated as an amendment to
 this Deed, and signed by the duly authorized representatives of both the parties and duly registered. 
+
+12A.
+Reference of Existing Difference: The parties record that a difference has arisen between them under the prior Deed as to the amount of the RTOSOA maintenance and generator charges payable by the Lessee for the period from 16 October 2003 to 15 October 2005, the Lessor claiming a sum of Rs.86,400/- (Rupees eighty six thousand four hundred only) and the Lessee admitting a sum of Rs.52,000/- (Rupees fifty two thousand only). The parties hereby agree to refer the said difference to the arbitration of a chartered accountant practising in Bangalore, to be jointly nominated by them within thirty days of the date of this Deed, whose award shall be final and binding on the parties. 
 
 13.
 Arbitration and Jurisdiction: In case of any dispute between the parties arising out of, in respect of or in any manner concerning this Deed, or the possession or
