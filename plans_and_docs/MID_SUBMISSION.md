@@ -55,7 +55,14 @@ Parsed from the India Code PDF of the Indian Contract Act, 1872.
 | Explanations | 15 | `illustrates` (parsed) | 201 |
 | Illustrations | 201 | `refers_to` (regex, all 11 checked by eye) | 11 |
 
-`interprets` edges from 15–20 leading rulings (manual, lawyer-checked) are added in Phase 2.
+**How each kind of edge is built** (every edge records whether it was parsed, found by regex or added by hand):
+
+| Edge | Method |
+|---|---|
+| `exception_to`, `explains`, `illustrates` | Parsed from the Act's own markers ("Exception 1.—", "Explanation.—", "Illustrations"). |
+| `refers_to` between sections | Regular expression on "section N" in the text; all 11 hits checked by eye. Mentions of other Acts are skipped. |
+| `interprets` (ruling → section) | **By hand** (Phase 2). With only 15–20 leading rulings, a team member reads each judgment and fills a sheet: citation, the section and limb it interprets, a one-sentence holding, and a source link; the lawyer checks the sheet. An LLM may suggest candidate rulings, but no edge is added without a person reading the judgment. |
+| Lease `uses_term`, `refers_to` | Lease parser: defined terms in quotes or capitals, and "Clause N" / "sub-clause (x)" references (table below). |
 
 ### Parsed leases
 
@@ -89,7 +96,27 @@ Dev mix:
 
 ### Element checklists
 
-Per defect type, from PLAN.md section 6 as corrected by the lawyer: restraint of trade (restrained party, activity, window, goodwill sale), bar on proceedings (restricted party, rights covered, degree, alternative forum, named court competent), time limit (affected party, what is limited, period and trigger, effect on expiry). The decision rules in `src/models/verify.py` reproduce the gold verdict of every pilot item, and of every fixture item but FX-09 (labelled before the lawyer's correction), from its gold elements (tested).
+Before giving a verdict, the model fills in the elements of the clause's defect type; element accuracy is measured against the gold elements in the answer key. The elements, from PLAN.md section 6 as corrected by the lawyer in Session 1 (`ELEMENTS` in `src/common/schemas.py`):
+
+| Defect type | Element | The question it answers | Allowed values |
+|---|---|---|---|
+| Restraint of trade (s.27) | `restrained_party` | Who is restrained? | tenant, landlord, both |
+| | `restrained_activity` | From what? | trade_or_business (any business anywhere), premises_use (what these premises may be used for) |
+| | `window` | When does the restraint run? | during_term, after_term, both |
+| | `window_start_and_length` | Starting when, for how long, and where? | free text, e.g. "end of lease; 2 years; 3 km" |
+| | `goodwill_sale` | Is it given on a sale of the business with its goodwill (Exception 1)? | yes, no |
+| Bar on proceedings (s.28(a), first limb) | `restricted_party` | Whose right to sue is restricted? | tenant, landlord, both |
+| | `rights_covered` | Which rights? | under_lease, other |
+| | `degree` | Shut out entirely, or only partly? | absolute, partial |
+| | `alternative_forum` | Where must disputes go instead? | arbitration (Exception 1), named_court, none |
+| | `named_court_competent` | If a named court, would it otherwise have jurisdiction? | yes, no, cannot_tell |
+| Time limit (s.28(a) second limb, s.28(b)) | `affected_party` | Whose time is limited? | tenant, landlord, both |
+| | `what_is_limited` | The time to sue, or a step under the contract (e.g. a notice)? | time_to_sue, contractual_step |
+| | `period_and_trigger` | How long, starting from what event? | free text, e.g. "6 months from the cause of action" |
+| | `effect_on_expiry` | What happens when the time runs out? | claim_barred, right_extinguished, none |
+| | `bank_guarantee` | Is it a bank guarantee's own claim period (Exception 3)? | yes, no (recorded; the lawyer advised that a lease clause is never the bank's own guarantee, so the rules ignore it) |
+
+The decision rules in `src/models/verify.py` reproduce the gold verdict of every pilot item, and of every fixture item but FX-09 (labelled before the lawyer's correction), from its gold elements (tested).
 
 ---
 
