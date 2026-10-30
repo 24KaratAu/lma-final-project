@@ -126,3 +126,14 @@ def test_trial_writes_report_with_mock(tmp_path):
     report = gen_pairs.main(["--n", "10", "--backend", "mock", "--out", str(tmp_path)])
     assert report["n"] == 10 and report["rejection_rate"] == 1.0  # the mock writes no clause
     assert (tmp_path / "rejected.jsonl").exists()
+
+
+def test_stub_leases_cut_every_dev_clause(tmp_path):
+    from src.eval import stub_leases
+
+    items, leases = stub_leases.build(tmp_path)
+    assert len(items) == 61 and len(leases) == 8
+    text = {c.clause_id: c.text for lease in leases.values() for c in lease.clauses}
+    assert all(15 <= len(t.split()) <= 300 for t in text.values())
+    assert "following obligations" not in text["S01-9(I)(n)"]  # stops before the "(II)" heading
+    assert text["P03-7.3"].endswith("English.") and "Page 15" not in text["P03-7.3"]
