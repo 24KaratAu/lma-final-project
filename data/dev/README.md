@@ -10,7 +10,7 @@ The clauses are written into copies of the three spare deeds in `../pilot/leases
 | S02 | Hyderabad | 2003 | DV-09 – DV-15, DA-08 – DA-14 |
 | S03 | — (template, premises left blank) | 2026 | DV-16 – DV-20, DA-15 – DA-21 |
 
-**DA-01 – DA-21** (Amitabh): 14 time limits (s.28(b)) and 7 restraint of trade, planted in the same three deeds. They were written in parallel with the DV items, so where both used the same clause number the DA clause took the next free one (e.g. S01 cl. 9(II)(l), S02 GTC-12B, GTC-12C and GTC-42C, S03 cl. 2(i)–(j) and 3(f)–(i)). DA items are not yet in Batch A.
+**DA-01 – DA-21** (Amitabh): 14 time limits (s.28(b)) and 7 restraint of trade, planted in the same three deeds. They were written in parallel with the DV items, so where both used the same clause number the DA clause took the next free one (e.g. S01 cl. 9(II)(l), S02 GTC-12B, GTC-12C and GTC-42C, S03 cl. 2(i)–(j) and 3(f)–(i)). The lawyer labelled them blind as Batch A, part 2.
 
 ## Files
 
@@ -19,9 +19,17 @@ The clauses are written into copies of the three spare deeds in `../pilot/leases
 | `planted/` | Copies of S01–S03 with the dev clauses written in. |
 | `items.csv` | Where each clause sits (lease and clause number). |
 | `answer_key.jsonl` | The team's answer for each clause, in the labelled-item format. |
-| `../../docs/legal/batch_a_answers.csv` | The lawyer's blind answers (Batch A), with reasons. |
+| `answer_sheet_blank.csv` | Blank sheet for DA-01 – DA-21, as sent to the lawyer. |
+| `../../docs/legal/batch_a_answers.csv` | The lawyer's blind answers for DV-01 – DV-20 (Batch A), with reasons. |
+| `../../docs/legal/batch_a2_answers.csv` | The lawyer's blind answers for DA-01 – DA-21 (Batch A, part 2), with reasons. |
 
-The lawyer's answers agree with the answer key on all 20 verdicts and all 20 sections. On DV-03 the key cites Exception 1 to s.28 and the lawyer cites s.28 alone.
+The lawyer's answers agree with the answer key on all 41 verdicts and all 41 sections. On DV-03 the key cites Exception 1 to s.28 and the lawyer cites s.28 alone.
+
+Points from the lawyer's reasons on the DA items, for Session 2:
+
+- **DA-08** (S02 GTC-42C, 3 years from the end of the lease) and **DA-11** (S02 GTC-25(d), 3 years from the "event"): valid, but borderline. For a claim that accrues after the lease ends, or an indemnity where time runs from the loss, the period can be shorter than 3 years from accrual, and the clause would be void to that extent.
+- **DA-13** and **DA-21** (in-term restraints on business elsewhere): refer, as in the Session 1 rule. DA-21 raises a question: is a PSU's choice of office location "trade or business" at all?
+- **DA-18** (S03 cl. 3(h)): void because the guarantee period is under one year (Exception 3 needs at least one year). The duty to furnish the guarantee survives.
 
 ## Mix
 
