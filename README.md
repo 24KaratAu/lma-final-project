@@ -23,4 +23,4 @@ pytest -q
 
 ## Rules
 
-Work on a branch (`data/`, `graph/`, `model/`, `agent/`, `eval/` + topic) and open a PR. You can merge your own PR once the `test` check passes and your branch is up to date with `main`; GitHub blocks it otherwise. The full checklist is in [`CLAUDE.md`](CLAUDE.md).
+Work on a branch (`data/`, `graph/`, `model/`, `agent/`, `eval/` + topic) and open a PR. You can merge your own PR once `pytest -q` passes locally on a branch rebased on `main`; there is no CI on GitHub. The full checklist is in [`CLAUDE.md`](CLAUDE.md).

@@ -7,7 +7,7 @@ Team ClosedAI, LMA Group Project 2026: statute-grounded enforceability checking 
 Anyone may merge their own pull request, but only after every step below passes. If any step fails, stop, fix it, and start the list again. Never merge "to fix it later".
 
 1. **Work on a branch**, never on `main`: `data/`, `graph/`, `model/`, `agent/` or `eval/` plus a short topic, e.g. `graph/lease-parser`.
-2. **Bring in the latest `main`** before opening or merging the PR: `git fetch origin && git rebase origin/main`. GitHub refuses the merge if the branch is behind `main`.
+2. **Bring in the latest `main`** before opening or merging the PR: `git fetch origin && git rebase origin/main`.
 3. **Run the tests locally** and make sure they all pass: `pip install -r requirements-dev.txt && pytest -q`. Add or update tests for any new code.
 4. **Check the diff** with `git diff origin/main...HEAD`:
    - Only your own folders changed (README.md, "Layout"), unless the change was agreed with their owner.
@@ -15,7 +15,7 @@ Anyone may merge their own pull request, but only after every step below passes.
    - No model weights, API keys, tokens, raw lease PDFs or run outputs.
    - Nothing under `data/test/` changed after the test set is frozen (PLAN.md section 11).
 5. **Push and open a PR** that says in plain words what changed and why.
-6. **Wait for the `test` check on the PR to pass** (`gh pr checks <number> --watch`). GitHub blocks the merge until it does.
+6. **Run the tests again after the final rebase.** There is no CI on GitHub, so this local run is the only check before merging.
 7. **Merge with squash**: `gh pr merge <number> --squash --delete-branch`.
 8. After merging, tell the team in one line what landed.
 
