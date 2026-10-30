@@ -113,6 +113,8 @@ def test_check_keeps_good_pair_and_rejects_bad_ones():
     assert gen_pairs.check(spec, json.dumps(nested), set(), CFG)[1] == []
     extra = good | {"elements": good["elements"] | {"landlord": "Landlord"}}  # second trial: invented names
     assert gen_pairs.check(spec, json.dumps(extra), set(), CFG)[1] == []
+    placeholder = good | {"elements": good["elements"] | {"period_and_trigger": "free text"}}  # third trial
+    assert gen_pairs.check(spec, json.dumps(placeholder), set(), CFG)[1] == ["placeholder"]
     assert "premises_use" in gen_pairs.gen_prompt(spec | {"hint": "restrained_activity is premises_use"})
     assert "restrained_party" not in gen_pairs.gen_prompt(spec) and '"ICA-28" or "ICA-28-E3"' in gen_pairs.gen_prompt(spec)
 
