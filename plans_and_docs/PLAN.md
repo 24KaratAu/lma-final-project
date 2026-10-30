@@ -266,7 +266,7 @@ If the lawyer can only do sessions 1 and 2, the remaining items rely on two-memb
 
 ## 9. Compute: Kaggle now, Ada if approved
 
-**Status on 24 Oct:** the team has no Ada access. All GPU work runs on Kaggle until Ada is approved. The code stays portable: `generate()` and the training scripts take paths and settings from the config, so the same commit runs on Kaggle, Ada or a laptop with the `mock` backend.
+**Status on 30 Oct:** the team has no Ada access. All GPU work runs on Kaggle until Ada is approved. The smoke test and two generation trials have run there (results below). The code stays portable: `generate()` and the training scripts take paths and settings from the config, so the same commit runs on Kaggle, Ada or a laptop with the `mock` backend.
 
 ### Kaggle (primary)
 
@@ -280,34 +280,40 @@ If the lawyer can only do sessions 1 and 2, the remaining items rely on two-memb
 **What that means for us**
 
 - **GPU hours are the constraint**, not memory. Every run logs its GPU hours, and Amitabh reports the team's remaining quota at each checkpoint.
-- **Memory is easier than on Ada.** 16 GB leaves room for QLoRA on a 7–8B model; the smoke test finds the longest input that fits (aim for 1,024 tokens).
-- **Use vLLM for inference** where the model supports it. Batched generation is several times faster than plain `transformers`, and the Phase 3 test runs need it to fit the quota.
+- **Memory is easier than on Ada.** 16 GB leaves room for QLoRA on a 7–8B model. Measured: QLoRA on Qwen2.5-7B-Instruct fits inputs of **1,536 tokens** on a T4; 2,048 runs out of memory.
+- **vLLM is dropped.** Its Kaggle build needs CUDA 13, and Kaggle has torch 2.11 with CUDA 12.8. Inference uses the `hf` backend in 4-bit with batches of 8: **3.8 s per call** batched, 8.2 s unbatched (Qwen2.5-7B-Instruct, T4). If the Phase 3 runs do not fit the quota, retry vLLM when Kaggle updates CUDA, or cut seeds (section 12).
+- **Kaggle runs transformers 5 and Python 3.13.** transformers 5 dropped `warmup_ratio`, so training sets warmup in steps.
 - **Every job must survive a 12-hour cutoff.** Training saves a checkpoint at least every 30 minutes and can resume; evaluation writes predictions as it goes and skips items already done.
 - **Spread jobs across accounts.** Each person runs their own share of configurations from their own account, never someone else's.
 - **Keep everything private.** Notebooks and datasets stay private, since they hold the leases and the test set. A public notebook would leak the test set.
 
 **Smoke test checklist (Amitabh, by Mon 26 Oct)**
 
-- [ ] All four accounts phone-verified; GPU and internet switch on in a notebook
-- [ ] The private repo clones using a GitHub token stored in Kaggle Secrets
-- [ ] `bitsandbytes` 4-bit loading works on T4 and on P100
-- [ ] One generation timed, to replace the 3-seconds-per-call guess in the proposal; the same with vLLM
-- [ ] 20-step QLoRA run completes; note peak memory and the longest input that fits
-- [ ] A checkpoint saved, the session restarted, and training resumed from it
-- [ ] A background run ("Save & Run All") finishes and its output can be downloaded
+- [x] Amitabh's account phone-verified, GPU and internet on. The other accounts are still to confirm.
+- [x] ~~The private repo clones using a GitHub token stored in Kaggle Secrets~~ **Changed:** code reaches Kaggle as a private dataset holding `repo.zip`, made with `git archive --add-virtual-file=COMMIT:<hash>`, so no token is stored on Kaggle and every run knows its commit
+- [x] `bitsandbytes` 4-bit loading works on T4 (2× T4, torch 2.11+cu128): Qwen2.5-7B-Instruct loads in 135 s, peak 5.1 GB. P100 not tested.
+- [x] One generation timed: 8.2 s per call, 3.8 s per call in batches of 8 (the proposal guessed 3 s). vLLM dropped (above).
+- [x] 20-step QLoRA run completes; longest input that fits is 1,536 tokens
+- [ ] A checkpoint saved, the session restarted, and training resumed from it (the cell is in `kaggle/smoke_test.ipynb`; result not recorded yet)
+- [x] Two runs of `kaggle/run.ipynb` (the 100-pair generation trials) finished and their outputs were downloaded
+
+**Generation trial** (100 training pairs with rule checks, Qwen2.5-7B-Instruct, `src/train/gen_config.json`):
+
+| Run | Kept | Main rejection reasons | Change after it |
+|---|---|---|---|
+| `gen-trial-1` | 0 / 100 | wrong JSON shape (98), elements left undecided (87), provision not allowed (25) | Prompt shows only the type's own elements, flat, and lists the allowed provisions |
+| `gen-trial-2` | 67 / 100 | rules disagree with the verdict (27), wrong JSON shape (9) | Hints for RT-2, RT-3 and RT-4; unknown element names dropped instead of rejecting the pair |
+
+In trial 2 the rejections were real labelling mistakes by the model, caught by the rule checks. Most were in RT-2, RT-3 and RT-4, which kept only 1 or 2 pairs each against 11 or 12 for the other families. Trial 3 checks the hints.
 
 **Runner notebook** (`kaggle/run.ipynb`): one notebook, the config is the only thing that changes
-```python
-from kaggle_secrets import UserSecretsClient
-token = UserSecretsClient().get_secret("GH_TOKEN")           # never paste the token into a cell
-!git clone -q https://{token}@github.com/<org>/<repo>.git repo
-%cd repo
-!git checkout <commit>                                         # pin the commit for every logged run
-!pip install -q -r requirements.txt
-!python -m src.eval.run --config configs/<config>.yaml --out /kaggle/working/runs
+```bash
+# on the laptop: package the exact commit, then upload it as a new version of the private dataset
+git archive --format=zip --add-virtual-file=COMMIT:$(git rev-parse HEAD) -o repo.zip HEAD
 ```
+In the notebook: unzip the dataset, `pip install -r requirements.txt`, then run the one `COMMAND` cell (e.g. `python -m src.train.gen_pairs ...` or `python -m src.eval.run ...`). The last cell zips `runs/` for download.
 
-Storage rule: code comes from git, model weights download from Hugging Face at the start of each session, and run outputs go to `/kaggle/working/runs/<run_id>/`. After each run, the owner copies the outputs out (download, or save them as a private Kaggle Dataset). Anything not copied out is lost when the session's output is replaced.
+Storage rule: code comes from the `repo.zip` dataset, model weights download from Hugging Face at the start of each session, and run outputs go to `/kaggle/working/runs/<run_id>/`. After each run, the owner copies the outputs out (download, or save them as a private Kaggle Dataset); Amitabh keeps his in `D:\lma_outputs\`, outside the repo. Anything not copied out is lost when the session's output is replaced.
 
 **Colab** is for debugging and the demo only: free sessions disconnect when idle and sometimes get no GPU, so no logged run depends on it.
 
