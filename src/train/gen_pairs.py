@@ -23,9 +23,9 @@ CONFIG = Path(__file__).with_name("gen_config.json")
 
 
 def sample_specs(cfg: dict, n: int) -> list[dict]:
-    """n requests spread evenly over the families that are not held out."""
+    """n requests spread evenly over the families that are neither held out nor marked "generate": false."""
     rng = random.Random(cfg["seed"])
-    families = [(dtype, fam) for dtype, fams in cfg["families"].items() for fam in fams if not fam.get("held_out")]
+    families = [(dtype, fam) for dtype, fams in cfg["families"].items() for fam in fams if not fam.get("held_out") and fam.get("generate", True)]
     specs = []
     for i in range(n):
         dtype, fam = families[i % len(families)]

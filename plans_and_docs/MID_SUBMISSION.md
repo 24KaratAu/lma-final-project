@@ -31,7 +31,7 @@ The task: given a clause of an Indian commercial lease, decide whether it is **v
 | `verify()`: element-check prompt, parser, decision rules | Done | `src/models/verify.py` |
 | Fixed pipeline (retrieve → verify per clause) | Done | `src/agent/pipeline.py` |
 | Evaluation harness (defect recall/precision/F1, false-alarm rate, citation, section recall@k, by type and form) | Done | `src/eval/` |
-| Training-pair generator with rule checks; QLoRA script | Done; three trials run (0 → 67 → 90 of 100 kept) | `src/train/`, `kaggle/` |
+| Training-pair generator with rule checks; QLoRA script | Done; four trials run (0 → 67 → 90 → 92 of 100 kept) | `src/train/`, `kaggle/` |
 | Graph retrieval, controller agent, fine-tuned verifier | Phase 2 | — |
 
 The fixed pipeline runs end to end on the dev set with the frontier model (B2), with and without retrieval.
@@ -161,6 +161,16 @@ By type and form (no retrieval):
 
 The open model is 0.08 F1 behind Opus and 0.12 behind Sonnet. The gap is in false alarms (PL-14, DV-13, DA-08, DA-11; two of them the clauses the lawyer called borderline), in cross-clause items, where it is right on fewer than half, and in citations on bar-on-proceedings clauses (0.35), mostly because it gives no provision for clauses it judges valid or hands off. Closing this gap with retrieval and a fine-tuned verifier is the project's main question.
 
+**Choice of base model.** B1 was run the same way with two smaller open models, all in 4-bit on a Kaggle T4:
+
+| Model | Parameters | Peak GPU memory | Verdict accuracy | Defect F1 | False-alarm rate | Cross-clause accuracy | GPU-hours |
+|---|---|---|---|---|---|---|---|
+| **Qwen2.5-7B-Instruct** | 7.6B | 5.1 GB | **0.69** | **0.82** | **0.11** | 0.47 | 0.36 |
+| Phi-3.5-mini-instruct | 3.8B | 4.7 GB | 0.66 | 0.69 | 0.34 | 0.79 | 0.73 |
+| Qwen2.5-3B-Instruct | 3.1B | 2.7 GB | 0.49 | 0.63 | 0.63 | 0.53 | 0.39 |
+
+Qwen2.5-7B is the base model for fine-tuning: best F1 and by far the fewest false alarms. Phi-3.5-mini's high cross-clause accuracy comes with calling a third of the valid and hand-off clauses void, and Qwen2.5-3B calls nearly two-thirds of them void. All three fit in 11 GB, so they would also run on the Ada cluster. Phi-3.5-mini stays as the smaller model in the Phase 4 model comparison. (Qwen2.5-7B's peak memory is from the smoke test; the other two are from these runs.)
+
 Section recall@5 is 0 without retrieval by construction (no evidence path); with flat retrieval it is 0.27 (exact provision), as in section 5.3.
 
 ### 5.3 Retrieval: section recall@k on dev (60 items with a gold provision)
@@ -186,8 +196,9 @@ By type (BM25, section@5): bar on proceedings 0.90, time limit 0.90, restraint o
 | Trial 1 | 0/100 | wrong JSON shape (98), elements undecided (87), provision not allowed (25) | Show only the type's own elements, flat; list allowed provisions |
 | Trial 2 | 67/100 | rules disagree with the verdict (27), wrong JSON shape (9) | Per-family hints for RT-2/3/4; drop unknown element names |
 | Trial 3 | 90/100 | rules disagree (8), wrong JSON shape (4), wrong verdict (3) | Sharper RT-3/RT-4 hints; reject placeholder values |
+| Trial 4 | 92/100 | rules disagree (5), unparseable (3) | RT-3 no longer generated (below); config frozen |
 
-In trials 2 and 3 the rejections were real labelling mistakes caught by the rule checks, mostly in three restraint-of-trade families. The checks cannot catch a pair whose elements the model set to fit the rule: some RT-3 "goodwill sale" pairs only forbid selling the business. That family is reviewed by hand before training. Trial 4, with sharper hints, is running.
+In trials 2 and 3 the rejections were real labelling mistakes caught by the rule checks, mostly in three restraint-of-trade families. The checks cannot catch a pair whose elements the model set to fit the rule: some RT-3 "goodwill sale" pairs only forbid selling the business. A hand check of trial 4 settled it: none of the 9 kept RT-3 pairs was a real sale of goodwill with the seller agreeing not to compete; each was a ban on selling the business plus a post-term non-compete, which is a void restraint, not the Exception 1 case. RT-3 is therefore not generated (`"generate": false` in the config) and gets a small set of hand-written pairs instead. RT-4 kept 8 of 11 in trial 4, up from 4; one of the 8 lets the restraint run past the term and is removed by the hand check every restraint-of-trade pair gets before training. The generation config is frozen from here, before any test item is written.
 
 ---
 
@@ -199,7 +210,7 @@ In trials 2 and 3 the rejections were real labelling mistakes caught by the rule
 | No Ada (HPC) access | All GPU work on Kaggle (2× T4, ~30 GPU-h/week/account); jobs resume after the 12-hour cutoff |
 | vLLM does not run on Kaggle (CUDA 13) | `hf` backend, 4-bit, batches of 8: 3.8 s per call |
 | QLoRA memory on a T4 | Inputs capped at 1,536 tokens (measured), gradient accumulation |
-| Small model gets the JSON wrong | Flat element sheet, allowed provisions listed, rule checks reject bad pairs (0 → 67 → 90 kept) |
+| Small model gets the JSON wrong | Flat element sheet, allowed provisions listed, rule checks reject bad pairs (0 → 67 → 90 → 92 kept) |
 | Lease numbering differs in every deed | Parser follows each deed's numbering; tested so that every dev item and gold-path clause resolves |
 | Dense retrieval misses the statute | BM25 as flat retriever; graph expansion over exceptions in Phase 2 |
 | Claude Pro usage limits for B2 | One clause per call, runs resume; fallback is a small amount of API credit for B2 only |

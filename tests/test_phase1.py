@@ -88,6 +88,7 @@ def test_specs_skip_held_out_families():
     held = {f["id"] for fams in CFG["families"].values() for f in fams if f.get("held_out")}
     specs = gen_pairs.sample_specs(CFG, 60)
     assert held and not held & {s["family"] for s in specs}
+    assert "RT-3" not in {s["family"] for s in specs}  # generate: false after trial 4
     assert gen_pairs.sample_specs(CFG, 60) == specs  # seeded
 
 
