@@ -31,7 +31,7 @@ The task: given a clause of an Indian commercial lease, decide whether it is **v
 | `verify()`: element-check prompt, parser, decision rules | Done | `src/models/verify.py` |
 | Fixed pipeline (retrieve → verify per clause) | Done | `src/agent/pipeline.py` |
 | Evaluation harness (defect recall/precision/F1, false-alarm rate, citation, section recall@k, by type and form) | Done | `src/eval/` |
-| Training-pair generator with rule checks; QLoRA script | Done, trials run | `src/train/`, `kaggle/` |
+| Training-pair generator with rule checks; QLoRA script | Done; three trials run (0 → 67 → 90 of 100 kept) | `src/train/`, `kaggle/` |
 | Graph retrieval, controller agent, fine-tuned verifier | Phase 2 | — |
 
 The fixed pipeline runs end to end on the dev set with the frontier model (B2), with and without retrieval.
@@ -97,7 +97,7 @@ Per defect type, from PLAN.md section 6 as corrected by the lawyer: restraint of
 
 | | Model | Setting | Status |
 |---|---|---|---|
-| **B1** | Qwen2.5-7B-Instruct, 4-bit | Few-shot element-check prompt, no retrieval | Code and Kaggle runner ready; dev numbers not in yet (runs on Kaggle) |
+| **B1** | Qwen2.5-7B-Instruct, 4-bit | Few-shot element-check prompt, no retrieval | **Run on dev** on a Kaggle T4 (section 5.2) |
 | **B2** | Claude Opus 5.5 via Claude Code print mode, tools disabled | Same element-check prompt, one clause per call | **Run on dev** (section 5.2) |
 
 B2 is described as "Claude via Claude Code print mode, tools disabled", not as an API call. Claude Code version and date are logged with each run.
@@ -109,7 +109,7 @@ B2 is described as "Claude via Claude Code print mode, tools disabled", not as a
 1. **No retrieval vs flat retrieval** (B2 model, dev): section 5.2.
 2. **Flat retriever: BM25 vs dense embeddings**, and **with vs without illustrations** in the index: section 5.3.
 
-The same no-retrieval vs flat ablation with the open model (B1) runs on Kaggle with B1.
+The same no-retrieval vs flat ablation with the open model (B1 with flat retrieval) is the next Kaggle run.
 
 ---
 
@@ -117,18 +117,18 @@ The same no-retrieval vs flat ablation with the open model (B1) runs on Kaggle w
 
 ### 5.1 Pilot: frontier models on whole leases (Gate 0)
 
-Each model read each of the 5 planted pilot deeds whole (6,900–14,700 words), in a fresh call with tools off and a neutral prompt that does not say clauses were planted, and listed every clause it judged void under s.27 or s.28. The deeds hold 20 labelled clauses: 9 void, 11 look-alikes (valid or hand off). Raw answers are saved; a flag is matched to an item by the quoted opening words of the clause.
+Each model read each of the 5 planted pilot deeds whole (6,900–14,700 words), in a fresh call with tools off and a neutral prompt that does not say clauses were planted, and listed every clause it judged void under s.27 or s.28. The deeds hold 20 labelled clauses: 9 void, 11 look-alikes (valid or hand off). Raw answers are saved; a flag is matched to an item by the quoted opening words of the clause, or by its clause number when the planted text sits inside an existing clause.
 
-| Model (Claude Code 2.1.314, print mode, tools off) | Void caught | Missed | False alarms on look-alikes | Other clauses flagged |
+| Model (Claude Code 2.1.312, print mode, tools off) | Void caught | Missed | False alarms on look-alikes | Other clauses flagged |
 |---|---|---|---|---|
-| Claude Opus 5.5 | 8/9 | 1 (PL-13) | 1 (PL-15) | 0 |
+| Claude Opus 5.5 | 9/9 | 0 | 1 (PL-15) | 0 |
 | Claude Sonnet 5.5 | 9/9 | 0 | 0 | 0 |
 
-Opus missed PL-13 (P03 cl. 12: a claim bar in the last paragraph of a long hand-over clause) and flagged PL-15 (P04 cl. 27.1: a clause the key hands off). Neither model flagged any clause outside the 20 items.
+Opus flagged PL-15 (P04 cl. 27.1, an exclusive-jurisdiction clause the key hands off) as partly void. Both caught PL-13, a claim bar planted in the last paragraph of a long hand-over clause. Neither model flagged any clause outside the 20 items.
 
 **What this means.** On planted, single-deed defects, frontier models are already near ceiling, which matches the fallback the plan set for this outcome (PLAN.md section 2): the project's weight moves to (1) whether a **small open model** with retrieval and a fine-tuned verifier can approach this, (2) **cross-clause** items, where the clause is void only once a definition or another clause is read with it, and (3) **subtler look-alikes** (in-term restraints, expert determinations, periods at the statutory limit), which make up most of the 41 dev items written after the pilot. PLAN.md section 2 asks the team to stop and decide when the pilot shows (almost) no misses; this fallback is our proposal for that decision.
 
-### 5.2 B2 on dev, with and without retrieval
+### 5.2 Baselines on dev: B2 with and without retrieval, and B1
 
 Claude Opus 5.5 (Claude Code 2.1.314, print mode, tools off), one call per clause with the element-check prompt and five few-shot examples (the lawyer's own illustrations, not dev clauses). The model sees the clause alone; with flat retrieval it also sees the top 5 statute provisions (BM25). One run each (git commit `3386db5`); Claude Code offers no seed, so the three repeats come in Phase 3.
 
@@ -150,6 +150,16 @@ By type and form (no retrieval):
 **What the errors are.** 12 of 61 items are wrong in at least one setting, and 11 of those are wrong in both. Most are over-cautious hand-offs: valid look-alikes (PL-08, PL-10, DV-03, DA-02, DA-07) and void restraints (DV-10, DV-12, DA-06) sent to a lawyer instead of decided. Two of the three misses (DV-12, DA-06) are restraints whose reach depends on a term defined in another clause (S02 Section 3(f), S01 cl. 15A.2), which the model never sees when it reads the clause alone; in the third (DV-10) it took the restraint for a goodwill sale under Exception 1. Both false alarms are cross-clause: DV-13 (a restraint whose window is fixed by the defined "Expiration Date") and DA-11 (a 3-year limit that runs from a defined "Limitation Date").
 
 **Retrieval did not help B2.** Flat retrieval changed two items: DA-11 moved from a false "void" to a hand-off (still not the gold "valid"), and DV-17 moved from a correct "valid" to a hand-off. The frontier model already knows ss.27–28, so retrieved statute text adds little; what it lacks is the **lease's** context. This is the case for graph retrieval that follows the lease's own `uses_term` and `refers_to` edges to the definitions and linked clauses, and the main hypothesis for Phase 2. For the small open model (B1), which knows the statute less well, statute retrieval may matter more; that ablation runs on Kaggle.
+
+**B1 and a second frontier model.** B1 is Qwen2.5-7B-Instruct in 4-bit on a Kaggle T4 (0.36 GPU-hours, git commit `b8476cd`), with the same element-check prompt and the clause alone. As a second frontier reference, Claude Sonnet 5.5 was run the same way.
+
+| Setting | Verdict accuracy | Defect recall | Defect precision | Defect F1 | False-alarm rate | Citation correct | Cross-clause accuracy |
+|---|---|---|---|---|---|---|---|
+| **B1** Qwen2.5-7B (4-bit), no retrieval | 0.69 | 0.81 (21/26) | 0.84 | 0.82 | 0.11 (4/35) | 0.73 | 0.47 |
+| B2 Claude Opus 5.5, no retrieval | 0.82 | 0.88 (23/26) | 0.92 | 0.90 | 0.06 (2/35) | 0.92 | 0.68 |
+| B2 Claude Sonnet 5.5, no retrieval | 0.80 | 0.88 (23/26) | 1.00 | 0.94 | 0.00 (0/35) | 0.87 | 0.68 |
+
+The open model is 0.08 F1 behind Opus and 0.12 behind Sonnet. The gap is in false alarms (PL-14, DV-13, DA-08, DA-11; two of them the clauses the lawyer called borderline), in cross-clause items, where it is right on fewer than half, and in citations on bar-on-proceedings clauses (0.35), mostly because it gives no provision for clauses it judges valid or hands off. Closing this gap with retrieval and a fine-tuned verifier is the project's main question.
 
 Section recall@5 is 0 without retrieval by construction (no evidence path); with flat retrieval it is 0.27 (exact provision), as in section 5.3.
 
@@ -175,8 +185,9 @@ By type (BM25, section@5): bar on proceedings 0.90, time limit 0.90, restraint o
 |---|---|---|---|
 | Trial 1 | 0/100 | wrong JSON shape (98), elements undecided (87), provision not allowed (25) | Show only the type's own elements, flat; list allowed provisions |
 | Trial 2 | 67/100 | rules disagree with the verdict (27), wrong JSON shape (9) | Per-family hints for RT-2/3/4; drop unknown element names |
+| Trial 3 | 90/100 | rules disagree (8), wrong JSON shape (4), wrong verdict (3) | Sharper RT-3/RT-4 hints; reject placeholder values |
 
-In trial 2 the rejections were real labelling mistakes caught by the rule checks, mostly in three restraint-of-trade families. Trial 3 (with the hints and a check against placeholder values) is next.
+In trials 2 and 3 the rejections were real labelling mistakes caught by the rule checks, mostly in three restraint-of-trade families. The checks cannot catch a pair whose elements the model set to fit the rule: some RT-3 "goodwill sale" pairs only forbid selling the business. That family is reviewed by hand before training. Trial 4, with sharper hints, is running.
 
 ---
 
@@ -188,7 +199,7 @@ In trial 2 the rejections were real labelling mistakes caught by the rule checks
 | No Ada (HPC) access | All GPU work on Kaggle (2× T4, ~30 GPU-h/week/account); jobs resume after the 12-hour cutoff |
 | vLLM does not run on Kaggle (CUDA 13) | `hf` backend, 4-bit, batches of 8: 3.8 s per call |
 | QLoRA memory on a T4 | Inputs capped at 1,536 tokens (measured), gradient accumulation |
-| Small model gets the JSON wrong | Flat element sheet, allowed provisions listed, rule checks reject bad pairs (0 → 67 kept) |
+| Small model gets the JSON wrong | Flat element sheet, allowed provisions listed, rule checks reject bad pairs (0 → 67 → 90 kept) |
 | Lease numbering differs in every deed | Parser follows each deed's numbering; tested so that every dev item and gold-path clause resolves |
 | Dense retrieval misses the statute | BM25 as flat retriever; graph expansion over exceptions in Phase 2 |
 | Claude Pro usage limits for B2 | One clause per call, runs resume; fallback is a small amount of API credit for B2 only |
@@ -212,13 +223,13 @@ In trial 2 the rejections were real labelling mistakes caught by the rule checks
 ## 8. Reproducing the numbers
 
 ```bash
-pip install -r requirements-dev.txt && pytest -q                    # 67 tests
+pip install -r requirements-dev.txt && pytest -q                    # 68 tests
 python -m src.graph.statute --pdf data/raw/statute/A1872-09.pdf     # statute graph (PDF from India Code)
 python -m src.graph.lease_parser data/pilot/planted/*.txt data/dev/planted/*.txt --out data/leases
 python -m src.retrieval.evaluate --modes flat dense                 # section 5.3
 python -m src.eval.run --items data/dev/items.jsonl --leases data/leases \
     --model claude-opus-5-5 --backend claude_cli --mode none        # B2, section 5.2 (then --mode flat)
-python -m src.baselines.pilot                                       # section 5.1
+python -m src.eval.pilot --models claude-sonnet-5-5 claude-opus-5-5 # section 5.1
 ```
 
 Run outputs (`runs/`) are not committed; every run writes its config, git commit, seed, platform and GPU hours there.
