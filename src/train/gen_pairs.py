@@ -15,7 +15,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from src.common.schemas import LabelledItem
+from src.common.schemas import ELEMENTS, LabelledItem
 from src.models.generate import generate
 from src.models.verify import PROVISIONS, RULES, element_sheet, build_prompt, rule_verdict
 
@@ -35,6 +35,7 @@ def sample_specs(cfg: dict, n: int) -> list[dict]:
                 "defect_type": dtype,
                 "family": fam["id"],
                 "desc": fam["desc"],
+                "hint": fam.get("hint", ""),
                 "verdict": rng.choice(fam["verdicts"]),
                 "form": "cross" if dtype != "out_of_scope" and rng.random() < cfg["cross_share"] else "single",
             }
@@ -60,7 +61,7 @@ def gen_prompt(spec: dict) -> str:
         [
             "Write one clause of an Indian commercial lease deed, in the style of a real registered deed "
             "(vary between older formal drafting and modern corporate drafting; vary names, places, numbers).",
-            f"Kind of clause: {spec['desc']}.\nDefect type: {dtype}.\nIts correct verdict must be: {spec['verdict']}.\n{cross}",
+            f"Kind of clause: {spec['desc']}.{' ' + spec['hint'] + '.' if spec.get('hint') else ''}\nDefect type: {dtype}.\nIts correct verdict must be: {spec['verdict']}.\n{cross}",
             RULES,
             elements,
             "Reply with one JSON object only: "
@@ -88,7 +89,8 @@ def check(spec: dict, raw: str, seen: set, cfg: dict) -> tuple[dict | None, list
     elements = out.get("elements") if isinstance(out.get("elements"), dict) else {}
     if isinstance(elements.get(spec["defect_type"]), dict):  # nested under the type name: unwrap
         elements = elements[spec["defect_type"]]
-    elements = {k: str(v) for k, v in elements.items()}
+    # Drop names the type doesn't have (e.g. "landlord": "Landlord"), rather than reject the pair.
+    elements = {k: str(v) for k, v in elements.items() if k in (ELEMENTS.get(spec["defect_type"]) or {})}
     try:
         LabelledItem(
             item_id=spec["pair_id"], lease_id="G", clause_id="G-1", defect_type=spec["defect_type"], form=spec["form"],

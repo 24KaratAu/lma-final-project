@@ -11,9 +11,9 @@
   "families": {
     "restraint_trade": [
       {"id": "RT-1", "desc": "tenant barred from a similar trade or business within some area for a period after the lease ends", "verdicts": ["void"]},
-      {"id": "RT-2", "desc": "tenant may use the premises only for a stated purpose during the term", "verdicts": ["valid"]},
-      {"id": "RT-3", "desc": "restraint given on assignment or sale of the business together with its goodwill", "verdicts": ["handoff"]},
-      {"id": "RT-4", "desc": "tenant barred from running a competing business elsewhere while the lease runs (e.g. a radius clause in a turnover-rent retail lease)", "verdicts": ["handoff"]},
+      {"id": "RT-2", "desc": "tenant may use the premises only for a stated purpose during the term", "verdicts": ["valid"], "hint": "restrained_activity is premises_use (what the premises may be used for), not trade_or_business; window is during_term"},
+      {"id": "RT-3", "desc": "restraint given on assignment or sale of the business together with its goodwill", "verdicts": ["handoff"], "hint": "the clause itself must sell or assign the business with its goodwill and restrain the seller, so goodwill_sale is yes"},
+      {"id": "RT-4", "desc": "tenant barred from running a competing business elsewhere while the lease runs (e.g. a radius clause in a turnover-rent retail lease)", "verdicts": ["handoff"], "hint": "the restraint lasts only while the lease runs, never after it ends; window is during_term"},
       {"id": "RT-5", "desc": "landlord will not let other units in the building to the tenant's competitors", "verdicts": ["valid", "handoff"], "held_out": true}
     ],
     "bar_proceedings": [
