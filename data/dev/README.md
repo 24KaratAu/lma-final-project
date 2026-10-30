@@ -48,4 +48,4 @@ Labels follow the rules in the lawyer's Session 1 review (`../../docs/legal/sess
 - **Cross-clause items** depend on: S01 cl. 13 (arbitration), S02 Section 3(b) (Expiration Date), S02 Section 3(f) (Restricted Period and Restricted Area), S02 GTC-11(d) (Lessor's Certificate), S02 GTC-42 (arbitration) and S03 cl. 3(c) (arbitration).
 - **Item ids:** DV-01 to DV-20 are used here. New dev items continue from DV-21.
 
-**Still to do:** merge these items with the pilot items into `items.jsonl` once the lease parser gives every clause its `clause_id`.
+**`items.jsonl`** is the 61-item dev set: the 20 pilot items (`../pilot/answer_key.jsonl`) followed by the 41 items above, unchanged. Every `clause_id` and clause in a `gold_path` points to a clause of `../leases/<lease_id>.json`, parsed from `../pilot/planted/` and `planted/` by `python -m src.graph.lease_parser`.
