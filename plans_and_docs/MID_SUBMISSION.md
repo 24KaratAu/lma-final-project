@@ -109,7 +109,7 @@ B2 is described as "Claude via Claude Code print mode, tools disabled", not as a
 1. **No retrieval vs flat retrieval** (B2 model, dev): section 5.2.
 2. **Flat retriever: BM25 vs dense embeddings**, and **with vs without illustrations** in the index: section 5.3.
 
-The same no-retrieval vs flat ablation with the open model (B1 with flat retrieval) is the next Kaggle run.
+The same no-retrieval vs flat ablation with the open model (B1): section 5.2.
 
 ---
 
@@ -170,6 +170,17 @@ The open model is 0.08 F1 behind Opus and 0.12 behind Sonnet. The gap is in fals
 | Qwen2.5-3B-Instruct | 3.1B | 2.7 GB | 0.49 | 0.63 | 0.63 | 0.53 | 0.39 |
 
 Qwen2.5-7B is the base model for fine-tuning: best F1 and by far the fewest false alarms. Phi-3.5-mini's high cross-clause accuracy comes with calling a third of the valid and hand-off clauses void, and Qwen2.5-3B calls nearly two-thirds of them void. All three fit in 11 GB, so they would also run on the Ada cluster. Phi-3.5-mini stays as the smaller model in the Phase 4 model comparison. (Qwen2.5-7B's peak memory is from the smoke test; the other two are from these runs.)
+
+**Ablation with the open model: B1 with and without flat retrieval.** Qwen2.5-7B (4-bit), the same prompt, with the top 5 statute provisions from BM25 added (git commit `439b8a7`, 0.40 GPU-hours, peak 9.4 GB with the longer prompt).
+
+| B1 Qwen2.5-7B | Items | Verdict accuracy | Defect recall | Defect precision | Defect F1 | False-alarm rate | Citation correct |
+|---|---|---|---|---|---|---|---|
+| No retrieval | 58 | 0.69 | 0.83 (20/24) | 0.83 | 0.83 | 0.12 (4/34) | 0.72 |
+| Flat retrieval | 58 | 0.69 | 0.75 (18/24) | 0.90 | 0.82 | 0.06 (2/34) | 0.68 |
+| No retrieval | 61 | 0.69 | 0.81 | 0.84 | 0.82 | 0.11 | 0.73 |
+| Flat retrieval | 61 | 0.67 | 0.69 | 0.90 | 0.78 | 0.06 | 0.68 |
+
+The no-retrieval run read each clause from the planted deed as cut by a stopgap script; the flat run read it from the lease parser. For 3 items (PL-09, PL-11, PL-13) the parser gives the whole clause where the stopgap gave only the planted paragraph, so the 58 items with the same text are the clean comparison. On them, statute retrieval leaves F1 unchanged and makes the small model more cautious: false alarms halve, and recall drops by two defects. Section recall@5 is 0.27, the BM25 figure in section 5.3: most retrieved provisions are not the gold one, so the model sees more statute text but mostly the wrong exception. As with B2, flat statute retrieval does not supply what the model lacks, the lease's own definitions; that is the case for graph retrieval in Phase 2. Re-running the no-retrieval arm on the parser's text is the first Phase 2 run.
 
 Section recall@5 is 0 without retrieval by construction (no evidence path); with flat retrieval it is 0.27 (exact provision), as in section 5.3.
 
