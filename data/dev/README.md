@@ -6,9 +6,11 @@ The clauses are written into copies of the three spare deeds in `../pilot/leases
 
 | ID | City | Year | Items |
 |---|---|---|---|
-| S01 | Bangalore | 2006 | DV-01 – DV-08 |
-| S02 | Hyderabad | 2003 | DV-09 – DV-15 |
-| S03 | — (template, premises left blank) | 2026 | DV-16 – DV-20 |
+| S01 | Bangalore | 2006 | DV-01 – DV-08, DA-01 – DA-07 |
+| S02 | Hyderabad | 2003 | DV-09 – DV-15, DA-08 – DA-14 |
+| S03 | — (template, premises left blank) | 2026 | DV-16 – DV-20, DA-15 – DA-21 |
+
+**DA-01 – DA-21** (Amitabh): 14 time limits (s.28(b)) and 7 restraint of trade, planted in the same three deeds. They were written in parallel with the DV items, so where both used the same clause number the DA clause took the next free one (e.g. S01 cl. 9(II)(l), S02 GTC-12B, GTC-12C and GTC-42C, S03 cl. 2(i)–(j) and 3(f)–(i)). DA items are not yet in Batch A.
 
 ## Files
 

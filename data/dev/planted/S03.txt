@@ -85,6 +85,9 @@ h) That the Lessee shall deliver the demised premises to the Lessor on the expir
      in such conditions as is consistent with the covenants and conditions herein contained.
 
 
+i) That the Lessee shall lodge a written claim for the refund of the interest free refundable advance with the Lessor within sixty (60) days of vacating the demised premises;
+j) That the Lessee shall not use the demised premises or any part thereof for the storage of transmission equipment, conductors or other materials, or as a guest house or transit accommodation, or for any purpose other than as an office;
+k) That during the lease period and any extension thereof, the Lessee shall not establish, operate or carry on any other office or establishment of its Eastern Region Transmission System-II within a radius of three (3) kilometres of the demised premises;
 2.   The Lessor hereby covenants with the Lessor as follows:
       That the Lessor shall pay all the taxes, rates, licence fees, ground rent and charges of
       whatever character assessed, levied, charges imposed or payable to any lawful authority
@@ -128,6 +131,8 @@ h) That during the lease period and any extended lease period, the Lessor shall 
      business of construction, operation or maintenance of power transmission systems;
 
 
+i) That if the Lessor does not object in writing to any deduction made by the Lessee from the rent under this Clause 2 on or before the Settlement Date, the Lessor shall be deemed to have accepted such deduction and to have waived all rights to recover the amount so deducted;
+j) That the Lessee shall give the Lessor written notice of any interruption or disturbance of the kind referred to in sub-clause (d) of this Clause 2 within the Notice Period;
 3.   It is hereby mutually agreed as follows:
 
 
@@ -153,6 +158,10 @@ e) That notwithstanding sub-clause (c) above, any claim of the Lessor against th
      Regional Grievance Committee of POWERGRID, Eastern Region-II, Kolkata, whose decision
      shall be final, and the Lessor shall not refer any such claim to arbitration or
      institute any suit or other proceeding in respect thereof in any court.
+f) That any suit or other legal proceeding by the Lessor against the Lessee for recovery of rent, or of any other sum, or for any other relief under this Deed, shall be instituted within three (3) months from the date on which such rent or sum fell due or the right to such relief arose, and not thereafter;
+g) That "Settlement Date" means the date falling forty-five (45) days after the date on which the Lessee intimates the Lessor in writing of any deduction made by it from the rent;
+h) That the Lessor shall, as security for the refund of the interest free refundable advance, furnish to the Lessee an irrevocable bank guarantee from a scheduled bank for an equal amount, which shall provide that the liability of the bank thereunder shall stand discharged, and all rights of the Lessee thereunder shall stand extinguished, unless a written claim is lodged with the bank within six (6) months from the date of expiry or earlier determination of this lease;
+i) That "Notice Period" means the period of fifteen (15) days commencing on the date on which the Lessee first becomes aware of any interruption or disturbance of its possession of the demised premises;
                           SCHEDULE OF THE PROPERTY
 
 

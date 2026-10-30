@@ -476,6 +476,8 @@ GTC-3: ELECTRICITY
  shall provide with separate electricity sub -meter for the
  Demised Premises during the Lease period.
 
+(d) The Lessee shall pay the full amount of any electricity bill raised by the Lessor under sub-clause (c) above within the Protest Window, under protest if the Lessee disputes the amount, without prejudice to the right of the Lessee to dispute, or to recover, any amount so paid.
+
 GTC-4: WATER
 
 (a) 1, 50,000 liters per day of water supply will be made available by Lessor
@@ -742,6 +744,14 @@ engaged in the business of software development or Information Technology
 Enabled Services (ITES) from any premises situated within the Restricted
 Area.
 
+GTC-12B: DEMAND FOR REFUND OF DEPOSIT
+
+The Lessee shall, within ninety (90) days from the date of expiry or earlier determination of this Lease, call upon the Lessor in writing to refund the Deposit. On the expiry of the said ninety days without such written demand having been made, the Lessor shall stand discharged from all liability to refund the Deposit or any part thereof, notwithstanding anything contained in GTC-12 or Section 5 of the Lease Deed.
+
+GTC-12C: POST-TERM COVENANT
+
+For a period of two (2) years after the Lessee surrenders the Demised Premises, the Lessee shall not take on lease, license or otherwise occupy any office premises within a radius of five (5) kilometres of Plot No. 5, Software Units Layout, Madhapur, for the purpose of carrying on any software or ITES business.
+
  RULES & REGULATION FOR USE OF PREMISES
  --------------------------------------
 
@@ -815,6 +825,8 @@ GTC-13: USE OF PREMISES
 
  - 10 -
 
+(g) Lessee shall not use the Demised Premises or any part thereof for the operation of a voice-based call centre or for any activity other than software development and allied Information Technology services, and shall not open the Demised Premises to walk-in members of the public.
+
 GTC-14: RULES & REGULATIONS
 
 (a) Lessee, its employees, agents, invitees, contractors and subcontractors
@@ -852,6 +864,10 @@ Demised Premises with its subsidiaries/affiliates or any entity belonging to the
 Lessee group of Companies in the field of Information Technology and/or
 Information Technology Enabled Services (ITES) with prior written approval of
 the Lessor.
+
+GTC-15A: EXCLUSIVITY OF OCCUPATION
+
+During the term of this Lease and any renewal thereof, the Lessee shall not, and shall procure that no member of the Lessee's group of companies shall, establish, operate or carry on any Information Technology or ITES business from any Competing Facility.
 
 GTC-16: ALTERATIONS
 
@@ -1191,6 +1207,8 @@ GTC-25: WAIVER OF SUBROGATION; INDEMNITY
  either recover the amounts by deducting it from the Rent and any such
  other amount payable or to terminate the Lease with immediate effect.
 
+(d) The Lessor shall not be liable under this GTC-25 or under GTC-24 in respect of any claim of the Lessee unless legal proceedings in respect of such claim have been instituted by the Lessee on or before the Limitation Date applicable to that claim.
+
 GTC-26: DEFAULT OF LESSEE
 
 (a) The following events shall be a default ("default") of Lessee under this
@@ -1507,6 +1525,10 @@ GTC-42B: JURISDICTION
 Subject to GTC-42, the courts at Pune shall alone have jurisdiction in
 respect of all matters arising out of or relating to this Lease.
 
+GTC-42C: LIMITATION OF CLAIMS
+
+Notwithstanding GTC-42, no claim of the Lessee against the Lessor arising out of or in connection with this Lease shall be enforceable by any suit, petition or other legal proceeding unless such proceeding is commenced within three (3) years from the date of expiry or earlier termination of this Lease, and upon the lapse of the said period every such claim shall be absolutely barred.
+
 GTC-43: PRONOUNS
 
 Feminine or neuter pronouns shall be substituted for those of the masculine
@@ -1703,3 +1725,20 @@ the Building Premises described above.
  and above the rates mentioned above in respect of the Demised Premises.
 
  /s/ Authorized Party /s/ Authorized Party
+
+ EXHIBIT "E"
+ TO
+ LEASE DEED BETWEEN
+
+ JVP SOFT (P) LTD. (Lessor)
+ AND
+ KANBAY SOFTWARE (INDIA) PVT. LIMITED (Lessee)
+
+ DEFINITIONS
+ -----------
+
+E.1 "Protest Window" means the period of seven (7) days commencing on the date of receipt by the Lessee of any electricity bill raised by the Lessor under GTC-3(c) of Exhibit 'A'.
+
+E.2 "Limitation Date" means, in relation to any claim, the date falling three (3) years after the date of the act, omission or event giving rise to that claim.
+
+E.3 "Competing Facility" means any office, development centre or other premises situated in the Madhapur, Gachibowli or Kondapur areas of Hyderabad, other than the Building Premises, which is owned or leased by any person other than the Lessor.
