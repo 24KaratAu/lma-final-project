@@ -556,7 +556,7 @@ The split is by kind of work, so each person owns one side end to end and can ex
 
 | Task | Due | Hours |
 |---|---|---|
-| Item-drafting job on Kaggle (open model, not Claude; section 9), handed to Saksham | Sat 7 Nov | 4 |
+| Item-drafting job on Kaggle with an open model (section 9), handed to Saksham | Sat 7 Nov | 4 |
 | Agent tools over Saksham's graph: `get_clause`, `lookup_definition`, `search_graph`, `expand` | Sun 8 Nov | 6 |
 | Controller agent: step loop, state, step budget, hand-off, tool-call log; fixed-pipeline variant | Mon 9 Nov | 14 |
 | Lease-parser fixes so all 70 pool items resolve (agreed with Saksham) | Sun 8 Nov | 4 |
@@ -587,5 +587,5 @@ Both totals are about nine hours a day from Fri 6 to Fri 13 Nov. That does not f
 
 - **Who sees the test set before the freeze:** Saksham only. Nobody runs any model or system on test items before the freeze, and all tuning stays on the dev set.
 - **Second labeller:** the lawyer. If the lawyer cannot label every test item, the lawyer labels a blind 40-item sample spread over the three types and both forms, and the report gives that agreement figure and says the rest is single-labelled.
-- **Merging:** each of us merges our own PRs after the checklist in `CLAUDE.md`; a change in the other person's folders needs their OK in the PR.
+- **Merging:** each of us merges our own PRs after the merge checklist passes; a change in the other person's folders needs their OK in the PR.
 
