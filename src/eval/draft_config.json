@@ -1,0 +1,59 @@
+{
+  "_note": "Test-item drafting config (PLAN.md section 14). Separate from src/train/gen_config.json, which is frozen for training. A different model, seed and prompt from training generation, and every family is drafted, including the ones held out of training. Family descriptions follow the pilot, dev and pool READMEs; edit them if they do not match what the families mean.",
+  "model": "Qwen/Qwen2.5-14B-Instruct",
+  "backend": "hf",
+  "batch_size": 8,
+  "seed": 1,
+  "temperature": 0.9,
+  "max_new_tokens": 800,
+  "overdraw": 2,
+  "cross_share": 0.33,
+  "embed_share": 0.3,
+  "clause_words": [15, 350],
+  "quota": {
+    "restraint_trade": {"void": 50, "lookalike": 50},
+    "bar_proceedings": {"void": 50, "lookalike": 50},
+    "time_limit": {"void": 50, "lookalike": 50},
+    "out_of_scope": {"handoff": 40}
+  },
+  "styles": [
+    "older formal Indian conveyancing style ('the Lessee doth hereby covenant with the Lessor', 'hereinafter called')",
+    "modern corporate drafting with numbered sub-clauses and capitalised defined terms",
+    "a public-sector or government lease template, plain and rule-like",
+    "a short plain-English office lease"
+  ],
+  "families": {
+    "restraint_trade": [
+      {"id": "RT-1", "desc": "tenant barred from a similar trade or business within some area for a period after the lease ends", "verdicts": ["void"]},
+      {"id": "RT-2", "desc": "tenant may use the premises only for a stated purpose during the term", "verdicts": ["valid"]},
+      {"id": "RT-3", "desc": "on a sale of the tenant's business at the premises together with its goodwill, the seller agrees with the buyer not to carry on a like business within a limited area (Exception 1)", "verdicts": ["handoff"], "hint": "it must be a real sale of the business with its goodwill; a clause that only forbids selling or assigning the business is not this family"},
+      {"id": "RT-4", "desc": "tenant barred from running a competing business elsewhere while the lease runs (e.g. a radius clause in a turnover-rent retail lease)", "verdicts": ["handoff"], "hint": "the restraint lasts only while the lease runs and says so in words, never after it ends"},
+      {"id": "RT-5", "desc": "landlord will not let other units in the building or complex to the tenant's competitors", "verdicts": ["valid", "handoff"], "held_out_of_training": true}
+    ],
+    "bar_proceedings": [
+      {"id": "BP-1", "desc": "one party's decision, computation or certificate is final and cannot be questioned in any court or forum", "verdicts": ["void"]},
+      {"id": "BP-2", "desc": "disputes referred to arbitration under the Arbitration and Conciliation Act, 1996", "verdicts": ["valid"]},
+      {"id": "BP-3", "desc": "courts of a named city alone have jurisdiction", "verdicts": ["valid", "handoff"], "held_out_of_training": true, "hint": "valid when the named city is where the premises are; handoff when the lease does not show that the named court has jurisdiction"},
+      {"id": "BP-4", "desc": "a party waives, or is barred from, any suit, arbitration or other proceeding for a class of claims (e.g. utility failures, delay in handover)", "verdicts": ["void"]},
+      {"id": "BP-5", "desc": "arbitration only if both parties agree at the time, while recourse to courts is barred in any event", "verdicts": ["void"]},
+      {"id": "BP-6", "desc": "the parties refer a difference that has already arisen (e.g. the area of the premises) to a named person or panel (Exception 2)", "verdicts": ["valid"]},
+      {"id": "BP-7", "desc": "a surveyor's, architect's or engineer's certificate on a question of fact is final and binding", "verdicts": ["handoff", "void"], "hint": "handoff when the expert is independent and the courts are not expressly excluded; void when the expert is one party's nominee and every court and tribunal is shut out"}
+    ],
+    "time_limit": [
+      {"id": "TL-1", "desc": "claims barred unless a suit or claim is brought within a period shorter than the limitation period", "verdicts": ["void"]},
+      {"id": "TL-2", "desc": "a party must give notice, cure a breach or pay within a period, with no loss of the right to sue", "verdicts": ["valid"]},
+      {"id": "TL-3", "desc": "a period to sue equal to or longer than the statutory limitation period (three years for money claims)", "verdicts": ["valid"]},
+      {"id": "TL-4", "desc": "a right is deemed waived or extinguished, or a party discharged from liability, if not exercised within a period", "verdicts": ["void"], "held_out_of_training": true},
+      {"id": "TL-5", "desc": "a short limit on starting arbitration, or on serving the notice that starts it, after which the claim is barred", "verdicts": ["void"]},
+      {"id": "TL-6", "desc": "a bill or statement is deemed accepted unless disputed within a period", "verdicts": ["handoff"]}
+    ],
+    "out_of_scope": [
+      {"id": "OOS-1", "desc": "lock-in rent, or pre-determined damages for holding over", "verdicts": ["handoff"]},
+      {"id": "OOS-2", "desc": "forfeiture of a security deposit or development charges", "verdicts": ["handoff"]},
+      {"id": "OOS-3", "desc": "a cap on, or exclusion of, liability", "verdicts": ["handoff"]},
+      {"id": "OOS-4", "desc": "remedy limited to damages, with no injunction", "verdicts": ["handoff"]},
+      {"id": "OOS-5", "desc": "interest on late payment, plus cutting off services", "verdicts": ["handoff"]},
+      {"id": "OOS-6", "desc": "arbitration in a tenancy said to be governed by a rent control statute", "verdicts": ["handoff"]}
+    ]
+  }
+}
