@@ -11,6 +11,8 @@
 
 > Re-baselined on 24 Oct. The first version assumed a start on 12 Oct; that time is gone, so the same work is compressed into 21 days.
 
+> **From Fri 6 Nov the team is two people, Avnish and Saksham. Section 14 replaces the owners and dates in sections 1, 5 and 13 for everything still to do.**
+
 ---
 
 ## 1. Who owns what
@@ -434,7 +436,7 @@ Do not cut: the pilot, the frozen test set, naive RAG against graph RAG, the fro
 
 ## 13. Backup plan
 
-> **In force from Mon 26 Oct 2026.** The team runs with three people. Where this section and sections 1–8 disagree, this section wins.
+> **In force from Mon 26 Oct to Thu 5 Nov 2026; replaced by section 14 from Fri 6 Nov.** The team runs with three people. Where this section and sections 1–8 disagree, this section wins.
 
 ### Until the mid-submission (Mon 26 – Fri 30 Oct)
 
@@ -516,3 +518,74 @@ Totals before the changes of 26 Oct: Avnish about 40 hours, Saksham about 42, Am
 - **Training data:** Amitabh commits the training-pair generation config before Sat 31 Oct, before he writes any test items, so the training data cannot drift towards the test phrasing. One phrasing family per type stays held out (section 11).
 - **Second labeller:** replaced by the lawyer. If the lawyer cannot label Batch B, we cross-label blind: Saksham labels Avnish's items, Amitabh labels Saksham's, and Avnish labels Amitabh's (about 4 extra hours each).
 - **Answer keys** are committed per batch before the batch goes to the lawyer, and never edited afterwards. Changes after the lawyer's review go in a separate corrections file.
+
+---
+
+## 14. Two-person plan
+
+> **In force from Fri 6 Nov 2026.** The team is Avnish and Saksham. Where this section and any earlier section disagree, this section wins. Nothing was merged to `main` between the mid-submission (30 Oct) and 6 Nov, so all of Phase 2 onwards is still open.
+
+### How the work is split
+
+The split is by kind of work, so each person owns one side end to end and can explain all of it at the viva.
+
+| Person | Owns | Branch prefix | Folders |
+|---|---|---|---|
+| **Saksham** | **Data, legal and retrieval:** test items, lawyer, rulings, gold traces, graph retrieval, and the dataset, validation and graph sections of the report | `data/`, `graph/` | `data/`, `docs/legal/`, `src/graph/`, `src/retrieval/` |
+| **Avnish** | **System, models and evaluation:** agent and its tools, item-drafting job, fine-tuning, all runs on Kaggle, results, ablations, slides, demo, and assembling the report | `agent/`, `model/`, `eval/` | `src/agent/`, `src/models/`, `src/train/`, `src/eval/`, `src/baselines/`, `kaggle/`, `report/` |
+
+**Avnish does not read the test items.** He writes the drafting job; Saksham runs it, edits the drafts and labels them. The person who builds and tunes the system never sees the test set before the freeze, which is a stronger guarantee than section 13 had.
+
+### Saksham
+
+| Task | Due | Hours |
+|---|---|---|
+| Run the item-drafting job on Kaggle, then edit the drafts by hand into the test set (all three types, out-of-scope items, about a third cross-clause), with the answer key committed per batch | Mon 9 Nov | 25 |
+| Lawyer: send test batches, collect answers, Session 2 (disagreements, ruling summaries), log disagreements | Tue 10 Nov | 5 |
+| Freeze the test set and tag `test-v1` | Tue 10 Nov | 1 |
+| Rulings sheet and `interprets` edges (section 7), checked by the lawyer | Sun 8 Nov | 8 |
+| Graph retrieval: seed, expand one or two hops along `exception_to` and the lease's `uses_term`/`refers_to` edges, rerank; tune on dev, tag `retrieval-v1` | Mon 9 Nov | 12 |
+| Gold tool traces for 30 dev clauses | Mon 9 Nov | 5 |
+| Update section 6 and `ELEMENTS` with the lawyer's corrections; fix fixture FX-09 | Sat 7 Nov | 2 |
+| Retrieval ablation write-up (flat vs graph vs none, by type and form), retrieval error analysis | Thu 12 Nov | 4 |
+| Legal commentary on the failure cases; ten worked hard cases | Thu 12 Nov | 8 |
+| Report: dataset, validation (labelling method, lawyer agreement), architecture and graph sections | Fri 13 Nov | 8 |
+| **Total** | | **about 78** |
+
+### Avnish
+
+| Task | Due | Hours |
+|---|---|---|
+| Item-drafting job on Kaggle (open model, not Claude; section 9), handed to Saksham | Sat 7 Nov | 4 |
+| Agent tools over Saksham's graph: `get_clause`, `lookup_definition`, `search_graph`, `expand` | Sun 8 Nov | 6 |
+| Controller agent: step loop, state, step budget, hand-off, tool-call log; fixed-pipeline variant | Mon 9 Nov | 14 |
+| Lease-parser fixes so all 70 pool items resolve (agreed with Saksham) | Sun 8 Nov | 4 |
+| Training pool (2,000 kept pairs, one phrasing family held out), QLoRA, learning curve, adapter tagged `verifier-v1`, `verify()` served from the adapter | Tue 10 Nov | 18 |
+| Run-all script over the Kaggle accounts, launched unattended | Tue 10 Nov | 5 |
+| **Results table v1** on the frozen test set: baselines and full system | Wed 11 Nov | 4 |
+| No-adapter ablation, seeds, compute accounting, learning-curve plot | Thu 12 Nov | 6 |
+| Slides and demo | Fri 13 Nov | 6 |
+| Report: fine-tuning, agent, results sections; assemble the whole report | Fri 13 Nov | 10 |
+| **Total** | | **about 77** |
+
+Both totals are about nine hours a day from Fri 6 to Fri 13 Nov. That does not fit with the Diwali weekend (Sat 7 – Sun 8), so the cuts in section 12 are expected; the team agrees which ones before Mon 9 Nov and records them here.
+
+### Dates
+
+| When | What |
+|---|---|
+| Sat 7 Nov | Drafting job ready (Avnish); section 6 and FX-09 fixed (Saksham) |
+| Sun 8 Nov | Agent tools merged (Avnish); rulings sheet done (Saksham) |
+| Mon 9 Nov | Test items to the lawyer; graph retrieval frozen; agent runs end to end on dev |
+| Tue 10 Nov | Test set frozen, `test-v1`; adapter `verifier-v1`; runs launched |
+| Wed 11 Nov | Results table v1 on test |
+| Thu 12 – Fri 13 Nov | Ablations, error analysis, report, slides, demo |
+| Sat 14 Nov | Buffer, mock viva: each of us explains every component |
+| Sun 15 Nov | Final submission, repository tagged `final` |
+
+### Rules that change
+
+- **Who sees the test set before the freeze:** Saksham only. Nobody runs any model or system on test items before the freeze, and all tuning stays on the dev set.
+- **Second labeller:** the lawyer. If the lawyer cannot label every test item, the lawyer labels a blind 40-item sample spread over the three types and both forms, and the report gives that agreement figure and says the rest is single-labelled.
+- **Merging:** each of us merges our own PRs after the checklist in `CLAUDE.md`; a change in the other person's folders needs their OK in the PR.
+
