@@ -1,7 +1,7 @@
 """Fixed pipeline: one retrieve and one verify per clause.
 
-This is the no-agent variant from the proposal and the placeholder for
-run_agent until the controller agent lands in Phase 2.
+This is the no-agent variant from the proposal (`--agent pipeline`). The
+agent with tools is src/agent/controller.py.
 """
 
 from src.common.schemas import ELEMENTS, Lease, Prediction
