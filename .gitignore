@@ -20,3 +20,6 @@ hf/
 
 # Raw lease PDFs; commit cleaned text only
 data/raw/
+
+# Kaggle run downloads (unzip runs.zip into runs/ instead)
+kaggle/output/

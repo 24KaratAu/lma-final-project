@@ -49,6 +49,7 @@ def run_agent(lease: Lease, config: dict) -> list[Prediction]:
       max_steps      tool calls before verify is forced (default 6)
       k              statute search depth (default 5)
       evidence_k     statute nodes passed to verify, in the order found (default 8); lease clauses all go
+      seed_search    controller only: start with the statute search on the clause text (default True)
       handoff_below  hand off when verify's confidence is below this (default None: never)
       statute        (nodes, edges); default data/statute
       log            optional list; one dict per clause with the transcript is appended
@@ -103,7 +104,12 @@ def _fixed(clause, tools: Toolbox) -> list[dict]:
 def _control(clause, tools: Toolbox, config: dict) -> tuple[list[dict], bool]:
     reasoning = config.get("reasoning", "think")
     max_steps = config.get("max_steps", 6)
-    transcript, plan = [], None
+    transcript, plan, repeats = [], None, 0
+    if config.get("seed_search", True):
+        # Dev, 11 Nov: left to itself the 7B model often never searched the statute (think: 55 searches in 61 clauses,
+        # plan: 16), so every run starts from the statute search on the clause text; the model adds lease lookups.
+        q = {"query": clause.text}
+        transcript.append({"tool": "search_graph", "args": q, "observation": tools.call("search_graph", q), "reply": "(seed)"})
     for step in range(max_steps):
         reply = config["planner"](_prompt(clause, tools, transcript, reasoning, plan, max_steps - step))
         if reasoning == "plan" and plan is None:
@@ -119,6 +125,9 @@ def _control(clause, tools: Toolbox, config: dict) -> tuple[list[dict], bool]:
         if tool == "verify":
             return transcript, False
         if any(t["tool"] == tool and t["args"] == args for t in transcript):
+            repeats += 1
+            if repeats == 2:
+                return transcript, False  # Dev, 11 Nov: a model that repeats a call keeps repeating it; stop and verify
             obs = {"error": "already done; use the result above or call verify"}
             tools.calls.append(ToolCall(tool=tool, args=args))
         else:

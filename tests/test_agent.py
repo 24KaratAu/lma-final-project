@@ -92,9 +92,9 @@ def test_controller_follows_the_planner(lease, reasoning):
     cfg = {"targets": [{"item_id": "FX-01", "clause_id": "L00-14"}], "verify": echo_verify, "policy": "controller",
            "planner": planner, "reasoning": reasoning, "statute": STATUTE, "log": log}
     [p] = controller.run_agent(lease, cfg)
-    assert [c.tool for c in p.tool_calls] == ["lookup_definition", "search_graph", "search_graph", "verify"]
+    assert [c.tool for c in p.tool_calls] == ["search_graph", "lookup_definition", "search_graph", "search_graph", "verify"]
     assert "L00-1.1" in p.path and "ICA-27" in p.path
-    assert "already done" in json.dumps(log[0]["transcript"][2]["observation"])
+    assert "already done" in json.dumps(log[0]["transcript"][3]["observation"])
     assert not log[0]["budget_spent"]
     assert "Steps left: 6" in prompts[0] and "L00-1.1 (uses_term)" in prompts[0]
     assert controller.REASONING[reasoning] in prompts[0]
@@ -108,14 +108,30 @@ def test_controller_budget_and_handoff(lease):
            "planner": lambda p: '{"tool": "expand", "args": {"node_id": "ICA-' + str(len(log) + p.count("Step ") + 27) + '"}}',
            "max_steps": 2, "handoff_below": 0.5, "statute": STATUTE, "log": log}
     [p] = controller.run_agent(lease, cfg)
-    assert log[0]["budget_spent"] and len(p.tool_calls) == 3  # two steps, then verify is forced
+    assert log[0]["budget_spent"] and len(p.tool_calls) == 4  # seed search, two steps, then verify is forced
     assert p.verdict == "handoff"  # confidence 0.4 < 0.5
 
 
 def test_controller_stops_after_two_unreadable_replies(lease):
     [p] = controller.run_agent(lease, {"targets": [{"item_id": "FX-01", "clause_id": "L00-14"}], "verify": echo_verify,
                                        "policy": "controller", "planner": lambda p: "I am not sure.", "statute": STATUTE})
-    assert [c.tool for c in p.tool_calls] == ["verify"]
+    assert [c.tool for c in p.tool_calls] == ["search_graph", "verify"]  # the seed search still runs
+
+
+def test_controller_stops_when_a_call_is_repeated_twice(lease):
+    log = []
+    [p] = controller.run_agent(lease, {"targets": [{"item_id": "FX-01", "clause_id": "L00-14"}], "verify": echo_verify,
+                                       "policy": "controller", "planner": lambda p: '{"tool": "get_clause", "args": {"clause_id": "2"}}',
+                                       "seed_search": False, "statute": STATUTE, "log": log})
+    assert [c.tool for c in p.tool_calls] == ["get_clause", "get_clause", "verify"]
+    assert not log[0]["budget_spent"]
+
+
+def test_lookup_definition_finds_a_term_defined_inside_a_clause(lease):
+    text = 'The date of handover, on expiry or earlier termination, is hereinafter referred to as the “Exit Date”.'
+    lease = lease.model_copy(update={"clauses": lease.clauses + [lease.clauses[0].model_copy(update={"clause_id": "L00-30", "number": "30", "text": text})]})
+    got = Toolbox(lease, *STATUTE).lookup_definition("Exit Date")
+    assert got["definitions"][0]["clause_id"] == "L00-30" and "Exit Date" in got["definitions"][0]["text"]
 
 
 @pytest.mark.parametrize("agent", ["fixed", "controller"])
