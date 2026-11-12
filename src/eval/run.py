@@ -102,8 +102,9 @@ def main(argv=None):
 
     gen_kw = {"seed": args.seed} | ({"adapter": args.adapter} if args.adapter else {})
     verify = make_verify(args.model, args.backend, shots=not args.zero_shot, **gen_kw)
-    # The controller picks tools with the same loaded model (and adapter, if any), greedy, so one copy fits on a T4.
-    planner = lambda prompt: generate([prompt], args.model, backend=args.backend, max_new_tokens=300, **gen_kw)[0]
+    # The controller picks tools with the base model: the adapter was trained to give verdicts, not to choose tools.
+    # With an adapter it is switched off for these calls (base_only), so the GPU holds one copy of the weights.
+    planner = lambda prompt: generate([prompt], args.model, backend=args.backend, max_new_tokens=300, base_only=True, **gen_kw)[0]
 
     items = read_jsonl(args.items, LabelledItem)
     leases = read_leases(args.leases)

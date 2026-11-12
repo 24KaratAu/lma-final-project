@@ -8,6 +8,7 @@ imported only when their backend is used, so the mock runs anywhere.
 import json
 import shutil
 import subprocess
+from contextlib import nullcontext
 
 from src.common.mocks import mock_generate
 
@@ -19,6 +20,7 @@ def generate(prompts: list[str], model: str, backend: str = "hf", **kw) -> list[
 
     kw: max_new_tokens (512), temperature (0 = greedy), seed (0), batch_size (hf, 4),
         adapter (path to a LoRA adapter; hf), system (claude_cli system prompt).
+        base_only (hf): answer with the adapter switched off for this call.
     """
     if backend == "mock":
         return mock_generate(prompts, model)
@@ -29,18 +31,20 @@ def generate(prompts: list[str], model: str, backend: str = "hf", **kw) -> list[
     raise ValueError(f"unknown backend {backend!r}")
 
 
-def _hf(prompts, model, max_new_tokens=512, temperature=0.0, seed=0, batch_size=4, adapter=None, **_):
+def _hf(prompts, model, max_new_tokens=512, temperature=0.0, seed=0, batch_size=4, adapter=None, base_only=False, **_):
     import torch
     from transformers import set_seed
 
     set_seed(seed)
     tok, net = _load_hf(model, adapter)
+    # base_only: answer with the adapter switched off, sharing the loaded weights (no second copy on the GPU)
+    plain = net.disable_adapter() if adapter and base_only else nullcontext()
     out = []
     for i in range(0, len(prompts), batch_size):
         chats = [_chat(tok, p) for p in prompts[i : i + batch_size]]
         enc = tok(chats, return_tensors="pt", padding=True, add_special_tokens=False).to(net.device)
         sample = {"do_sample": True, "temperature": temperature} if temperature > 0 else {"do_sample": False}
-        with torch.no_grad():
+        with torch.no_grad(), plain:
             ids = net.generate(**enc, max_new_tokens=max_new_tokens, pad_token_id=tok.pad_token_id, **sample)
         out += tok.batch_decode(ids[:, enc["input_ids"].shape[1] :], skip_special_tokens=True)
     return out

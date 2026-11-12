@@ -142,3 +142,26 @@ def test_runner_with_agent_and_mock(tmp_path, agent):
     assert len((out / "preds.jsonl").read_text().splitlines()) == n
     assert len((out / "traces.jsonl").read_text().splitlines()) == n
     assert json.loads((out / "config.json").read_text())["agent"] == agent
+
+
+def test_planner_uses_the_base_model_and_verify_the_adapter(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_generate(prompts, model, backend="hf", **kw):
+        calls.append(kw)
+        return ['{"tool": "verify", "args": {}}'] * len(prompts)
+
+    def fake_make_verify(model, backend, shots=True, **gen_kw):
+        def verify(text, evidence, elements):
+            fake_generate([text], model, backend, **gen_kw)
+            return {"verdict": "handoff", "provision": None, "confidence": 0.0, "elements": {}}
+        return verify
+
+    monkeypatch.setattr(run, "generate", fake_generate)
+    monkeypatch.setattr(run, "make_verify", fake_make_verify)
+    run.main(["--items", str(FIX / "items.jsonl"), "--leases", str(FIX / "leases"), "--model", "m", "--backend", "hf",
+              "--agent", "controller", "--adapter", "ad", "--run-id", "a", "--out", str(tmp_path)])
+    planner = [c for c in calls if c.get("base_only")]
+    verifier = [c for c in calls if not c.get("base_only")]
+    assert planner and verifier
+    assert all(c["adapter"] == "ad" for c in calls)  # one loaded model; the planner switches the adapter off
