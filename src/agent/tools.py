@@ -9,6 +9,7 @@ Each call is logged and everything it returns is kept as evidence for the verifi
 Observations shown to the controller are cut to `obs_chars`; the verifier gets full text.
 """
 
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -77,10 +78,26 @@ class Toolbox:
             d for d in self.lease.definitions if t and (t in d.term.lower() or f"“{t}”" in d.text.lower() or f'"{t}"' in d.text.lower())
         ]
         if not found:
-            return {"error": f"no definition of {term!r} in lease {self.lease.lease_id}"}
+            return self._defined_inline(str(term).strip().strip("\"'“”"))
         for d in found:
             self._keep(d.clause_id, f"Definition of {d.term} (clause {self.clauses[d.clause_id].number or d.clause_id}): {d.text}")
         return {"definitions": [{"term": d.term, "clause_id": d.clause_id, "text": self._cut(d.text)} for d in found[:3]]}
+
+    def _defined_inline(self, term: str) -> dict:
+        """A term the parser did not list, defined inside a clause: (hereinafter called the "X"), is referred to as the "X"."""
+        pattern = re.compile(r"[“\"]" + re.escape(term) + r"[”\"]", re.I)
+        defining = re.compile(r"\b(means?|meaning|referred to|called|defined)\b", re.I)
+        hits = []
+        for c in self.lease.clauses:
+            for m in pattern.finditer(c.text):
+                around = c.text[max(0, m.start() - 200) : m.end() + 200]
+                hits.append((not defining.search(around), c, around))
+                break
+        if not hits:
+            return {"error": f"no definition of {term!r} in lease {self.lease.lease_id}"}
+        _, c, around = min(hits, key=lambda h: h[0])  # a clause that defines the term, else the first that quotes it
+        self._keep(c.clause_id, f"Lease clause {c.number} {c.heading}".strip() + f": {c.text}")
+        return {"definitions": [{"term": term, "clause_id": c.clause_id, "text": "..." + around + "..."}]}
 
     # Statute side
 
