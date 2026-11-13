@@ -1,5 +1,6 @@
 """Run-all plan, chunks and results table, on the fixtures with the mock backend."""
 
+import argparse
 from pathlib import Path
 
 import pytest
@@ -42,3 +43,10 @@ def test_runs_a_chunk_and_prints_the_table(tmp_path, monkeypatch, capsys):
     ran = {p.parent.name for p in tmp_path.glob("*/metrics.json")}
     assert ran and all(r.endswith("-fixtures") for r in ran)
     assert run_all.table(str(tmp_path)).count("\n") == len(ran) + 1
+
+
+def test_controller_uses_the_dev_choice():
+    [cfg] = [c for c in run_all.plan(10, "ad") if c["name"] == "agent-controller"]
+    a = argparse.Namespace(items="x/items.jsonl", leases="l", adapter="ad", reasoning="direct", out="o")
+    argv = run_all.argv_for(cfg, a)
+    assert "--no-seed-search" in argv and argv[argv.index("--reasoning") + 1] == "direct"

@@ -69,6 +69,8 @@ def main(argv=None):
                     help="pipeline: one retrieve + verify; fixed: the agent's tools in a fixed order; controller: the model picks the tools")
     ap.add_argument("--reasoning", default="think", choices=sorted(controller.REASONING))
     ap.add_argument("--max-steps", type=int, default=6)
+    ap.add_argument("--no-seed-search", action="store_true",
+                    help="controller: skip the opening statute search; the model picks every call (best on dev, 13 Nov)")
     ap.add_argument("--handoff-below", type=float, default=None, help="hand off when verify's confidence is below this")
     ap.add_argument("--k", type=int, default=5)
     ap.add_argument("--seed", type=int, default=0)
@@ -121,7 +123,7 @@ def main(argv=None):
             log = []
             preds = controller.run_agent(leases[lease_id], {
                 "targets": targets, "verify": verify, "policy": args.agent, "planner": planner, "reasoning": args.reasoning,
-                "max_steps": args.max_steps, "k": args.k, "handoff_below": args.handoff_below, "log": log})
+                "max_steps": args.max_steps, "k": args.k, "seed_search": not args.no_seed_search, "handoff_below": args.handoff_below, "log": log})
             with open(run_dir / "traces.jsonl", "a", encoding="utf-8") as f:
                 f.writelines(json.dumps(t, ensure_ascii=False) + "\n" for t in log)
         with open(preds_path, "a", encoding="utf-8") as f:
