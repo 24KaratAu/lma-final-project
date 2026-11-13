@@ -165,3 +165,11 @@ def test_planner_uses_the_base_model_and_verify_the_adapter(tmp_path, monkeypatc
     verifier = [c for c in calls if not c.get("base_only")]
     assert planner and verifier
     assert all(c["adapter"] == "ad" for c in calls)  # one loaded model; the planner switches the adapter off
+
+
+def test_runner_no_seed_search_reaches_the_controller(tmp_path):
+    out = run.main(["--items", str(FIX / "items.jsonl"), "--leases", str(FIX / "leases"), "--model", "m", "--backend", "mock",
+                    "--agent", "controller", "--no-seed-search", "--run-id", "a", "--out", str(tmp_path)])
+    assert json.loads((out / "config.json").read_text())["no_seed_search"] is True
+    traces = [json.loads(l) for l in (out / "traces.jsonl").read_text().splitlines()]
+    assert all(t.get("reply") != "(seed)" for tr in traces for t in tr["transcript"])

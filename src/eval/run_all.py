@@ -28,7 +28,8 @@ CONFIGS = [
     ("B1-flat", "kaggle", ["--agent", "pipeline", "--mode", "flat"], 1),
     ("agent-fixed-noadapter", "kaggle", ["--agent", "fixed"], 1),
     ("agent-fixed", "kaggle", ["--agent", "fixed", "ADAPTER"], 1),
-    ("agent-controller", "kaggle", ["--agent", "controller", "REASONING", "ADAPTER"], 6),
+    # Dev, 13 Nov: direct without the seed search had the best F1 (0.91); the seed search cost it 4 void clauses.
+    ("agent-controller", "kaggle", ["--agent", "controller", "REASONING", "--no-seed-search", "ADAPTER"], 6),
     ("B2-none", "laptop", ["--agent", "pipeline", "--mode", "none"], 1),
     ("B2-flat", "laptop", ["--agent", "pipeline", "--mode", "flat"], 1),
 ]
@@ -83,7 +84,7 @@ def main(argv=None):
     ap.add_argument("--items", default="data/test/items.jsonl")
     ap.add_argument("--leases", default="data/leases")
     ap.add_argument("--adapter", default=None, help="the fine-tuned verifier (qlora-<n>/adapter)")
-    ap.add_argument("--reasoning", default="think", help="the controller variant chosen on dev")
+    ap.add_argument("--reasoning", default="direct", help="the controller variant chosen on dev")
     ap.add_argument("--where", default="kaggle", choices=["kaggle", "laptop"])
     ap.add_argument("--frontier-model", default=None, help="B2 model id (laptop runs)")
     ap.add_argument("--frontier-backend", default=None, help="B2 backend of src.models.generate (laptop runs)")
