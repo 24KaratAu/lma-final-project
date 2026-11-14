@@ -88,7 +88,7 @@ Families used in the pilot, plus these new ones:
 | OOS-5 | Interest on late payment, plus cutting off services |
 | OOS-6 | Arbitration in a tenancy said to be under a rent control statute |
 
-The BP-7 hand-off items and the TL-6 items leave out the elements that none of the allowed values fit (`alternative_forum`, `effect_on_expiry`). Settle this when `ELEMENTS` is updated with the Session 1 corrections.
+The BP-7 hand-off items leave out `alternative_forum`, because none of its values fits. This is settled: `ELEMENTS` stays unchanged, and element accuracy counts only the elements a gold label gives (PLAN.md section 6). The TL-6 items have all their elements since the Batch B corrections made them void under s.28(b).
 
 ## Still to do
 

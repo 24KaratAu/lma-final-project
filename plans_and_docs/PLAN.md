@@ -193,24 +193,34 @@ All Phase 1 GPU work runs on Kaggle and does not wait for Ada.
 
 ---
 
-## 6. Element checklists (draft, for the lawyer to confirm)
+## 6. Element checklists (signed off by the lawyer)
 
-These are what "element accuracy" is scored against. They are a first draft from the text of the Act and must be signed off in lawyer session 1.
+These are what "element accuracy" is scored against. The lawyer confirmed the three checklists in Session 1 (`docs/legal/session1_review.md`) and refined the rulings in Session 2 (`docs/legal/session2_review.md`).
 
-**Post-term restraint of trade (Section 27)**
+**The elements and their allowed values are unchanged** (`ELEMENTS` in `src/common/schemas.py`). The lawyer's corrections changed the decision rules and the labels, not the elements. Changing them now would break the frozen test set (`test-v1`) and the training pairs, which both use them (decided 15 Nov 2026).
+
+The rule under each table is `rule_verdict` in `src/models/verify.py`. Where the law goes further than the elements can express, the item is labelled by hand, and the test-set README lists every such item (`data/test/README.md`).
+
+When none of an element's values fits a clause, the gold label leaves that element out: the BP-7 hand-offs (`alternative_forum`) and TE-140 (`degree`, `alternative_forum`). Element accuracy counts only the elements a gold label gives.
+
+**Restraint of trade (Section 27)**
 
 | Element | Values |
 |---|---|
 | `restrained_party` | tenant / landlord / both |
 | `restrained_activity` | trade or business generally / use of the premises only |
 | `window` | during term only / after term / both |
-| `window_start_and_length` | trigger (expiry, termination) and duration, resolved from definitions if needed |
+| `window_start_and_length` | trigger and duration, resolved from definitions if needed (recorded, but it decides nothing outside Exception 1) |
 | `goodwill_sale` | yes / no (Exception 1) |
 
-Draft rule: **void** if the activity is a trade or business and the window runs after the term and there is no sale of goodwill. **Valid** if it only limits use of the premises during the term. **Hand off** if goodwill is sold, since reasonableness is for a court.
-*Question for the lawyer:* how to treat a restraint on business elsewhere that applies only during the term.
+Rule:
+- Trade or business restrained after the term: **void**, however short or local. Section 27 has no reasonableness test outside Exception 1 (*Madhub Chunder*, *Krishan Murgai*, *Percept D'Mark*).
+- Use of the premises only, during the term: **valid** (a user clause). After the term: **hand off**.
+- Trade or business elsewhere, during the term only: **hand off**. This answers the question to the lawyer. A negative covenant during the term is generally not a restraint (*Niranjan Shankar Golikari*, *Gujarat Bottling*), but a landlord rarely has a franchisor's interest in what the tenant does elsewhere, so the commercial context decides.
+- Goodwill sold: **hand off** if all three conditions of Exception 1 hold (the seller restrains itself in favour of the buyer, within specified local limits, only while the buyer carries on a like business). If one is missing: **void**. The rule gives hand off for every goodwill sale, so these voids are labelled by hand.
+- A restraint on the landlord letting other units to the tenant's competitors: **valid** during the term, **hand off** if it continues after it.
 
-**Absolute bar on legal proceedings (Section 28(a), first limb)**
+**Bar on legal proceedings (Section 28(a), first limb)**
 
 | Element | Values |
 |---|---|
@@ -220,7 +230,14 @@ Draft rule: **void** if the activity is a trade or business and the window runs 
 | `alternative_forum` | arbitration / one named court / none |
 | `named_court_competent` | yes / no / cannot tell |
 
-Draft rule: **void** if absolute with no arbitration. **Valid** if it refers disputes to arbitration (Exception 1) or picks one court that already has jurisdiction. **Hand off** if the named court's jurisdiction cannot be told from the lease.
+Rule:
+- A binding agreement to arbitrate: **valid, Exception 1**. This includes "shall arbitrate; the courts have no jurisdiction", a decision that binds only until arbitrated, and a "may" clause when a binding arbitration clause elsewhere in the deed governs (Session 2). A sole arbitrator appointed by one party is still an arbitration agreement; only the appointment fails (*TRF*, *Perkins Eastman*, *CORE*).
+- Absolute with no forum, or one party's decision final: **void**. "Disputes may be referred to arbitration" is not an agreement to arbitrate (*Jagdish Chander*), so with a bar on the courts and no binding clause elsewhere it is void.
+- One named court. Parties may choose among competent courts but cannot confer jurisdiction (*Hakam Singh*, *A.B.C. Laminart*, *Swastik Gases*). The court where the premises are is always competent (s.16 CPC): **valid**. Another city that something in the deed connects (a party's office, the place of signing or of payment): **hand off**. Another city that nothing in the deed connects: **void**. Facts that might turn up outside the deed are not enough for hand off (Session 2).
+- An expert's or architect's determination "final and binding" on a technical fact: **hand off**, unless the clause also says expressly that no court may look at it (then void).
+- Labelled by hand: a bar on the courts where the deed's arbitration clause is still open but the two clauses conflict (PO-59, TE-032, TE-220) is **hand off**, while the rule gives valid.
+
+Which provision to cite (Session 2): **Exception 1** when the clause is valid because the dispute can go to arbitration; **s.28** when it is valid because the courts stay open or no forum is affected. A clause is under s.28 if it deals with who decides a claim, where or by when, even when it is valid. It is out of scope if it deals only with what can be recovered (caps and exclusions of liability, a remedy limited to damages) or has nothing to do with claims.
 
 **Time limit that cuts off claims (Section 28(a), second limb, and Section 28(b))**
 
@@ -232,8 +249,11 @@ Draft rule: **void** if absolute with no arbitration. **Valid** if it refers dis
 | `effect_on_expiry` | claim barred / right extinguished or liability discharged / none on the right to sue |
 | `bank_guarantee` | yes / no (Exception 3) |
 
-Draft rule: **void** if the clause limits the time to sue or extinguishes the right after a period. **Valid** if the period governs only a contractual step. **Hand off** if it is a bank guarantee.
-*Question for the lawyer:* whether any contractual period shorter than the statutory limitation period counts, and what that period is for lease claims.
+Rule:
+- The time to sue is cut short: **void under s.28(a)**. A right is extinguished, waived or forfeited, or a party discharged, once a period expires: **void under s.28(b)**. This includes "deemed accepted unless disputed" (TL-6), a notice clause with a waiver attached, and a short limit on starting arbitration (the Limitation Act applies to arbitrations, s.43 of the 1996 Act).
+- A period equal to or longer than the statutory limitation period has no effect on the right to sue: **valid**. This answers the second question to the lawyer: three years for money claims and twelve for the landlord's possession suit (the table in `docs/legal/session1_review.md`, section 3). A step with no consequence for claims (a notice, cure or payment period) is also valid.
+- Exception 3 covers only the bank's guarantee itself. A lease clause between the parties follows the ordinary rule, even when it is about a guarantee. Where the lease fixes the claim period the guarantee must contain, that period decides: one year or more is **valid (Exception 3)**, less is void. The rule ignores `bank_guarantee`, so the valid ones are labelled by hand.
+- Clause (b) applies only to deeds executed from 8 January 1997 (*Union of India v Indusind Bank*). An extinguishment clause in an older deed is valid, so record each deed's execution date.
 
 ---
 

@@ -19,8 +19,7 @@ PILOT = read_jsonl(ROOT / "data/pilot/answer_key.jsonl", LabelledItem)
 FIXTURE_ITEMS = read_jsonl(FIX / "items.jsonl", LabelledItem)
 
 
-# FX-09 still carries the pre-review bank-guarantee label; the lawyer's correction makes it void (PLAN.md section 13).
-@pytest.mark.parametrize("item", PILOT + [i for i in FIXTURE_ITEMS if i.item_id != "FX-09"], ids=lambda i: i.item_id)
+@pytest.mark.parametrize("item", PILOT + FIXTURE_ITEMS, ids=lambda i: i.item_id)
 def test_rules_reproduce_gold_verdicts(item):
     assert rule_verdict(item.defect_type, item.gold_elements) == item.gold_verdict
 
