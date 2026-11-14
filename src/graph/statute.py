@@ -164,10 +164,15 @@ def main(argv=None):
     ap.add_argument("--out", default="data/statute")
     args = ap.parse_args(argv)
     nodes, edges = build(Path(args.pdf))
+    # keep the read rulings: a rebuild from the PDF would otherwise drop them (src/graph/rulings.py)
+    from src.graph.rulings import SHEET, merge, read_sheet
+
+    if SHEET.exists():
+        nodes, edges = merge(nodes, edges, read_sheet(SHEET))
     write_jsonl(Path(args.out) / "nodes.jsonl", nodes)
     write_jsonl(Path(args.out) / "edges.jsonl", edges)
-    counts = {t: sum(n.type == t for n in nodes) for t in ("section", "exception", "explanation", "illustration")}
-    ecounts = {t: sum(e.type == t for e in edges) for t in ("exception_to", "explains", "illustrates", "refers_to")}
+    counts = {t: sum(n.type == t for n in nodes) for t in ("section", "exception", "explanation", "illustration", "ruling")}
+    ecounts = {t: sum(e.type == t for e in edges) for t in ("exception_to", "explains", "illustrates", "refers_to", "interprets")}
     print(f"{len(nodes)} nodes {counts}; {len(edges)} edges {ecounts}")
 
 
