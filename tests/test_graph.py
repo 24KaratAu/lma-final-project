@@ -6,6 +6,7 @@ import pytest
 
 from src.common.jsonl import read_jsonl, read_leases
 from src.common.schemas import LabelledItem, StatuteEdge, StatuteNode, check_graph, check_items
+from src.graph.items import apply_corrections, read_corrections
 from src.graph.lease_parser import parse_lease
 from src.graph.statute import parse_section, regex_edges, split_sections
 from src.retrieval import retrieve
@@ -104,6 +105,101 @@ def test_lease_parser_follows_the_deed_numbering():
     assert not any(src == "T01-2" and dst.startswith("T01-2(") for src, dst, _ in refs)  # not to its own sub-clauses
 
 
+# Numbering styles of the pool deeds (data/pool/), each cut down to a few lines: (deed, clause ids expected)
+LAYOUTS = {
+    "roman ARTICLEs, (i) and bare-letter sub-clauses (L01, L12)": (
+        "NOW THIS DEED WITNESSETH AS FOLLOWS:\n"
+        "                    ARTICLE I - TERM\n"
+        "a     The tenure of this lease shall be ten years.\n"
+        "b     The Lessee may terminate it early.\n"
+        "ARTICLE.II-LEASE RENT\n"
+        "(i)   The rent is Rs. 100.\n"
+        "(ii)  It is paid monthly; see Article I (b).\n",
+        ["preamble", "I", "I(a)", "I(b)", "II", "II(i)", "II(ii)"],
+    ),
+    "ARTICLE n over n.1 clauses, numbers run into the text (L06, L11, L14)": (
+        "NOW THEREFORE THIS DEED WITNESSETH:\n"
+        "ARTICLE 1\n"
+        "1.1The Lessor grants the lease.\n"
+        "1.2. Term: five years.\n"
+        "2. A numbered line inside an article is text.\n"
+        "ARTICLE 2\n"
+        "2.1 Rent is Rs. 100.\n"
+        "3.4 A number from another article is text.\n",
+        ["preamble", "1", "1.1", "1.2", "2", "2.1"],
+    ),
+    "lettered parts in capitals (L19)": (
+        "THIS LEASE DEED is made at New Delhi.\n"
+        "A.   THIS DEED WITNESSETH AS UNDER\n"
+        "(i)  The lessors let the premises.\n"
+        "B.   THE LESSEE HEREBY COVENANTS AS FOLLOWS:\n"
+        "(i)  To pay the rent.\n"
+        "(ii) To keep the premises clean.\n",
+        ["preamble", "A", "A(i)", "B", "B(i)", "B(ii)"],
+    ),
+    "1), A. parts and i. items (L09)": (
+        "NOW, THEREFORE THIS DOCUMENT WITNESSETH AS FOLLOWS:\n"
+        "1)\nDEFINITIONS AND INTERPRETATION\n"
+        "A. DEFINITIONS\n"
+        "i.\n“Building” shall mean the tower.\n"
+        "ii.\n“Term” shall mean five years.\n"
+        "B. INTERPRETATION\nHeadings are for convenience.\n"
+        "2)\nRENT\na)\nRent is Rs. 100.\n",
+        ["preamble", "1", "1(A)", "1(A)(i)", "1(A)(ii)", "1(B)", "2", "2(a)"],
+    ),
+    "numbering lost to OCR, 13A, and 14.(ii) on one line (L02, L17)": (
+        "NOW THIS DEED WITNESSETH:\n"
+        "1.\nThat the Lessor lets the premises.\n"
+        "2.\nThat the rent is Rs. 100.\n"
+        "0.\nThat the Lessor may take a loan.\n"
+        "13.\nThat the Lessee shall not alter the premises.\n"
+        "13A.\nThat the Lessee shall insure, and the Lessor may relet the premises under clause\n"
+        "14(a) in any manner it likes.\n"
+        "14.(i). If the Lessee defaults, the Lessor may terminate, as provided in sub-clause\n"
+        "14(a) of the Schedule.\n"
+        "14.(ii)  The deposit shall be refunded.\n"
+        "14(iii).  Notices go by post.\n"
+        "15.\nThis deed is signed below.\nA. Murugan\n",
+        ["preamble", "1", "2", "13", "13A", "14", "14(i)", "14(ii)", "14(iii)", "15"],
+    ),
+}
+
+
+@pytest.mark.parametrize("layout", LAYOUTS)
+def test_lease_parser_reads_the_pool_deed_layouts(layout):
+    deed, expected = LAYOUTS[layout]
+    lease = parse_lease(deed, "T02")
+    assert [c.number or "preamble" for c in lease.clauses] == expected
+
+
+def test_lease_parser_keeps_stray_lines_as_text():
+    by_number = {c.number: c.text for c in parse_lease(LAYOUTS["numbering lost to OCR, 13A, and 14.(ii) on one line (L02, L17)"][0], "T02").clauses}
+    assert "may take a loan" in by_number["2"]  # "0." after "2." is not a clause
+    assert "14(a) in any manner" in by_number["13A"]  # a line that starts with a reference stays text
+    assert "14(a) of the Schedule" in by_number["14(i)"]
+    assert "A. Murugan" in by_number["15"]  # a signatory's initial is not sub-clause (A)
+    by_number = {c.number: c.text for c in parse_lease(LAYOUTS["ARTICLE n over n.1 clauses, numbers run into the text (L06, L11, L14)"][0], "T02").clauses}
+    assert "A numbered line inside an article is text" in by_number["1.2"]
+
+
+def test_pool_items_point_to_parsed_clauses():
+    pool = read_jsonl(ROOT / "data/pool/answer_key.jsonl", LabelledItem)
+    check_items(apply_corrections(pool, read_corrections(ROOT / "data/pool/corrections.jsonl")), LEASES, NODES)
+
+
+TEST_DIR = ROOT / "data/test"
+
+
+@pytest.mark.skipif(not (TEST_DIR / "items.jsonl").exists(), reason="the test set reaches main only at the freeze")
+def test_test_items_are_the_keys_plus_corrections_and_point_to_parsed_clauses():
+    items = read_jsonl(TEST_DIR / "items.jsonl", LabelledItem)
+    expected = []
+    for d in (ROOT / "data/pool", TEST_DIR):
+        expected += apply_corrections(read_jsonl(d / "answer_key.jsonl", LabelledItem), read_corrections(d / "corrections.jsonl"))
+    assert items == expected
+    check_items(items, LEASES, NODES)
+
+
 def test_dev_items_point_to_parsed_clauses():
     check_items(DEV, LEASES, NODES)
     assert len(DEV) == len({it.item_id for it in DEV}) == 61
@@ -111,7 +207,7 @@ def test_dev_items_point_to_parsed_clauses():
 
 @pytest.mark.parametrize("lease_id", sorted(LEASES))
 def test_committed_leases_match_a_fresh_parse(lease_id):
-    src = next(p for d in ("pilot", "dev") if (p := ROOT / f"data/{d}/planted/{lease_id}.txt").exists())
+    src = next(p for d in ("test", "pool", "dev", "pilot") if (p := ROOT / f"data/{d}/planted/{lease_id}.txt").exists())
     assert parse_lease(src.read_text(encoding="utf-8"), lease_id) == LEASES[lease_id]
 
 

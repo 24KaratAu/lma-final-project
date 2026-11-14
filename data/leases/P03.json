@@ -383,13 +383,31 @@
    "clause_id": "P03-10",
    "number": "10",
    "heading": "TERMINATION",
-   "text": "TERMINATION 1 Neither Party shall be entitled to terminate this lease during lock-in period except for reasons provided for in Clauses 10.1 (i), (ii) and (iii) below. i. By mutual consent of Parties duly recorded in writing such terms as may be agreed upon. ii. By either Party if the other Party hereto defaults in the performance of any of its obligations under this Lease Deed and such default is not cured within 30 days from the date of receipt of written notice of default issued by the non-defaulting Party in this regard. By either Party, where any clause of this Lease Deed specifically provides for termination. iii. If by operation of law and for the breach of the provisions contained in this Lease by the LESSOR, the LESSEE is prevented from continuing the Lease. 2 If in case, the LESSEE wish to terminate the Lease during lock in period, the LESSEE would be liable to pay the balance rentals for the remaining part of lock-in period or till a new tenant comes in, which ever is earlier. 3 The LESSEE may terminate this lease by giving to the LESSOR at lease (3) three months prior written notice, and if terminated in this fashion, LESSEE shall owe no further amounts except for amounts owed for use of the Schedule Property by LESSEE prior to termination. The LESSOR may only terminate in the event of the LESSEE not paying rent for a period of three months despite having notice of the same. 4 In the event of termination of the lease in any manner aforesaid, the LESSEE shall handover possession of the Schedule Property to the LESSOR along with Amenities, fixtures and fittings installed by the LESSOR, excepting normal wear and tear subject to the LESSOR not owing any money / amount to the LESSEE on any account whatsoever, Page 17 of 22 unless the LESSEE is prevented from such handover by reasons of destruction / demolition of the Scheduled Property. Upon termination for any reason other than pursuant to LESSEE’s breach, LESSEE shall owe no further amounts except for amounts owed for use of the Scheduled Property by LESSEE prior to termination under these presents. Simultaneous with the LESSEE handing over possession of the Schedule Property, the LESSOR shall hand over to the LESSEE the entire security Deposit paid by the LESSOR to the LESSEE"
+   "text": "TERMINATION 1 Neither Party shall be entitled to terminate this lease during lock-in period except for reasons provided for in Clauses 10.1 (i), (ii) and (iii) below. (i) By mutual consent of Parties duly recorded in writing such terms as may be agreed upon. (ii) By either Party if the other Party hereto defaults in the performance of any of its obligations under this Lease Deed and such default is not cured within 30 days from the date of receipt of written notice of default issued by the non-defaulting Party in this regard. By either Party, where any clause of this Lease Deed specifically provides for termination. (iii) If by operation of law and for the breach of the provisions contained in this Lease by the LESSOR, the LESSEE is prevented from continuing the Lease. 2 If in case, the LESSEE wish to terminate the Lease during lock in period, the LESSEE would be liable to pay the balance rentals for the remaining part of lock-in period or till a new tenant comes in, which ever is earlier. 3 The LESSEE may terminate this lease by giving to the LESSOR at lease (3) three months prior written notice, and if terminated in this fashion, LESSEE shall owe no further amounts except for amounts owed for use of the Schedule Property by LESSEE prior to termination. The LESSOR may only terminate in the event of the LESSEE not paying rent for a period of three months despite having notice of the same. 4 In the event of termination of the lease in any manner aforesaid, the LESSEE shall handover possession of the Schedule Property to the LESSOR along with Amenities, fixtures and fittings installed by the LESSOR, excepting normal wear and tear subject to the LESSOR not owing any money / amount to the LESSEE on any account whatsoever, Page 17 of 22 unless the LESSEE is prevented from such handover by reasons of destruction / demolition of the Scheduled Property. Upon termination for any reason other than pursuant to LESSEE’s breach, LESSEE shall owe no further amounts except for amounts owed for use of the Scheduled Property by LESSEE prior to termination under these presents. Simultaneous with the LESSEE handing over possession of the Schedule Property, the LESSOR shall hand over to the LESSEE the entire security Deposit paid by the LESSOR to the LESSEE"
   },
   {
    "clause_id": "P03-10.1",
    "number": "10.1",
    "heading": "",
-   "text": "Neither Party shall be entitled to terminate this lease during lock-in period except for reasons provided for in Clauses 10.1 (i), (ii) and (iii) below. i. By mutual consent of Parties duly recorded in writing such terms as may be agreed upon. ii. By either Party if the other Party hereto defaults in the performance of any of its obligations under this Lease Deed and such default is not cured within 30 days from the date of receipt of written notice of default issued by the non-defaulting Party in this regard. By either Party, where any clause of this Lease Deed specifically provides for termination. iii. If by operation of law and for the breach of the provisions contained in this Lease by the LESSOR, the LESSEE is prevented from continuing the Lease."
+   "text": "Neither Party shall be entitled to terminate this lease during lock-in period except for reasons provided for in Clauses 10.1 (i), (ii) and (iii) below. (i) By mutual consent of Parties duly recorded in writing such terms as may be agreed upon. (ii) By either Party if the other Party hereto defaults in the performance of any of its obligations under this Lease Deed and such default is not cured within 30 days from the date of receipt of written notice of default issued by the non-defaulting Party in this regard. By either Party, where any clause of this Lease Deed specifically provides for termination. (iii) If by operation of law and for the breach of the provisions contained in this Lease by the LESSOR, the LESSEE is prevented from continuing the Lease."
+  },
+  {
+   "clause_id": "P03-10.1(i)",
+   "number": "10.1(i)",
+   "heading": "",
+   "text": "By mutual consent of Parties duly recorded in writing such terms as may be agreed upon."
+  },
+  {
+   "clause_id": "P03-10.1(ii)",
+   "number": "10.1(ii)",
+   "heading": "",
+   "text": "By either Party if the other Party hereto defaults in the performance of any of its obligations under this Lease Deed and such default is not cured within 30 days from the date of receipt of written notice of default issued by the non-defaulting Party in this regard. By either Party, where any clause of this Lease Deed specifically provides for termination."
+  },
+  {
+   "clause_id": "P03-10.1(iii)",
+   "number": "10.1(iii)",
+   "heading": "",
+   "text": "If by operation of law and for the breach of the provisions contained in this Lease by the LESSOR, the LESSEE is prevented from continuing the Lease."
   },
   {
    "clause_id": "P03-10.2",
@@ -480,7 +498,7 @@
  "refs": [
   {
    "src": "P03-10",
-   "dst": "P03-10.1",
+   "dst": "P03-10.1(i)",
    "type": "refers_to"
   },
   {
