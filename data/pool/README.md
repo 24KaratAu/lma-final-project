@@ -51,7 +51,7 @@ The lawyer's answers agree with the answer key on 66 of 70 verdicts and 69 of 70
 | PO-66 | hand off, s.28 | void, s.28(b) |
 | PO-65 | hand off, out of scope | valid, s.28 Exception 1 |
 
-On PO-42 the key cites Exception 1 to s.28 and the lawyer cites s.28 alone.
+On PO-42 the key cites Exception 1 to s.28 and the lawyer cites s.28 alone. In Session 2 the lawyer settled it as Exception 1, because the clause is valid only while the Lessee can still arbitrate (`../../docs/legal/session2_review.md`, point 4), so the key stands. The same session ruled on PO-16 and PO-61: exclusive courts of another city stay **refer** when something in the deed puts that city in jurisdiction.
 
 ## Mix
 
