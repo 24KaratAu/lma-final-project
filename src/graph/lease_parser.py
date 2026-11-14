@@ -1,10 +1,11 @@
 """Lease parser: deed text -> clauses, definitions and cross-references (PLAN.md section 4).
 
-python -m src.graph.lease_parser data/pilot/planted/*.txt data/dev/planted/*.txt --out data/leases
+python -m src.graph.lease_parser data/pilot/planted/*.txt data/dev/planted/*.txt data/pool/planted/*.txt --out data/leases
 
 Clause ids follow the deed's own numbering, the way the answer keys cite it:
 "3(c)", "9(II)(i)", "5.5(d)", "12A", "GTC-42A" (Exhibit A of the P02/S02 deeds),
-"E.1" (an exhibit's own numbering), "AI.43A" (clause 43A of Annexure I).
+"E.1" (an exhibit's own numbering), "AI.43A" (clause 43A of Annexure I),
+"XXVIII(d)" (ARTICLE XXVIII), "D(vi)" (a lettered part of the deed), "1(A)(x)" and "12(J)" (lettered sub-clauses).
 A clause's text includes its sub-clauses, so a parent clause can be read whole.
 """
 
@@ -27,13 +28,19 @@ EXHIBIT = re.compile(r"^\s*EXHIBIT\s*[\"“']?([A-Z])[\"”']?\s*$")
 SCHEDULE = re.compile(r"^\s*SCHEDULE\b[^a-z]{0,40}$")
 
 # Clause markers at the start of a line: (kind, regex). Absolute kinds carry their whole id.
+# A number may run straight into its text when the text starts with a capital ("1.1The Lessor", "1.GRANT").
 GTC = re.compile(r"^\s*GTC-([\dlO]{1,3})([A-Z]?)\s*:\s*(.*)$")  # OCR: "GTC-l3" is GTC-13
 LETTERED = re.compile(r"^\s*([A-Z]\.\d+)\s+(.*)$")  # E.1, E.2 in an exhibit
 SECTION = re.compile(r"^\s*SECTION\s+(\d{1,3}[A-Z]?)\.?\s+(.*)$")
-DOTTED = re.compile(r"^\s*(\d{1,3}[A-Z]?(?:\.\d{1,3}[A-Z]?)+)\.?(?:\s+(.*))?$")
-NUMBER = re.compile(r"^\s*(\d{1,3}[A-Z]?)\.(?:\s+(.*))?$")
+# "ARTICLE I - TERM", "ARTICLE.I-TERM", "ARTICLE 4": in capitals, with at most a capitals heading after it
+ARTICLE = re.compile(r"^\s*ARTICLE[\s.]*([IVX]{1,7}|\d{1,3})\b\s*[-–—:.]?\s*([^a-z]*)$")
+DOTTED = re.compile(r"^\s*(\d{1,3}[A-Z]?(?:\.\d{1,3}[A-Z]?(?![a-z]))+)\.?(?:(?:\s+|(?=[A-Z“\"]))(.*))?$")
+NUMBER = re.compile(r"^\s*(\d{1,3}[A-Z]?(?![a-z]))([.)])(?:(?:\s+|(?=[A-Z“\"]))(.*))?$")  # "12." or "12)"
+COMBINED = re.compile(r"^\s*(\d{1,3}[A-Z]?)(\.?)\s*\(([ivx]{1,5}|[a-z])\)\.?(?:\s+(.*))?$")  # "14.(ii) The plot..."
 UPPER_ROMAN = re.compile(r"^\s*\(([IVX]{1,6})\)(?:\s+(.*))?$")
-LOWER = re.compile(r"^\s*\(?([a-z]{1,4})\)\.?(?:\s+(.*))?$")
+UPPER_LETTER = re.compile(r"^\s*\(?([A-Z])(?:\)|\.)(?:\s+(.*))?$")  # "A." or "(A)"
+LOWER = re.compile(r"^\s*\(?([a-z]{1,4})(?:\)\.?|\.)(?:\s+(.*))?$")  # "(a)", "a)", "a." or "ii."
+BARE_LETTER = re.compile(r"^\s{0,8}([a-z])\s{2,}(\S.*)$")  # "a     The tenure of this lease..." (L01, L07)
 
 OPERATIVE = re.compile(r"W[I1T]TNESS(?:ETH|ES AS)|NOW,? THEREFORE|NOW THIS|IT IS HEREBY (?:MUTUALLY )?AGREED|witnesseth")
 DEFINITION = re.compile(r"[\"“]([A-Z][\w\s'’\-/&]{1,60}?)[\"”]\s*(?:shall\s+)?(?:means?|includes?|shall\s+have\s+the\s+meaning)")
@@ -54,6 +61,7 @@ class Node:
     lines: list[str] = field(default_factory=list)
     children: list["Node"] = field(default_factory=list)
     cid: str = ""
+    start: int = -1  # line of the deed where the clause starts
 
 
 def _num_key(label: str) -> tuple[int, str]:
@@ -83,6 +91,10 @@ class Parser:
         self.stack: list[Node] = [self.root]
         self.prefix = ""
         self.last_top: tuple[int, str] | None = None
+        self.top_mark: str | None = None  # "." or ")": the deed's own style for numbered clauses
+        self.articles = False  # the deed is divided into ARTICLEs, so a bare "2." inside one is not a clause
+        self.line = 0  # index of the line being fed
+        self.order: list[tuple[str, int, Node]] = []  # (clause number, depth, node) in deed order, set by lease()
 
     # -- stack helpers
     def _in_stack(self, kind: str) -> int | None:
@@ -152,8 +164,14 @@ class Parser:
         if (m := LETTERED.match(raw)) and self.prefix == f"{m.group(1)[0]}.":
             self._top_absolute(m.group(1), m.group(2))
             return
+        if (m := ARTICLE.match(raw)) and (m.group(1).isdigit() or m.group(1) in ROMAN_UP):
+            label = m.group(1)
+            self.articles = True
+            self.last_top = _num_key(label) if label.isdigit() else (ROMAN_UP.index(label) + 1, "")
+            self._top(label, m.group(2).strip())
+            return
         if m := SECTION.match(raw):
-            if self._accept_top(m.group(1)):
+            if not self.articles and self._accept_top(m.group(1)):
                 self._top(m.group(1), m.group(2))
                 return
         if m := DOTTED.match(raw):
@@ -164,9 +182,13 @@ class Parser:
                 if m.group(2):
                     node.lines.append(m.group(2))
                 return
+        if (m := COMBINED.match(raw)) and self._combined(m.group(1), bool(m.group(2)), m.group(3), m.group(4)):
+            return
         if m := NUMBER.match(raw):
-            if self._accept_top(m.group(1)):
-                self._top(m.group(1), m.group(2))
+            label, mark, text = m.group(1), m.group(2), m.group(3)
+            if not self.articles and mark == (self.top_mark or mark) and self._accept_top(label, bare=not text):
+                self.top_mark = mark
+                self._top(label, text)
                 return
         if (m := UPPER_ROMAN.match(raw)) and len(self.stack) > 1:
             label = m.group(1)
@@ -175,12 +197,17 @@ class Parser:
             if label == "I" or (prev in ROMAN_UP and label in ROMAN_UP and ROMAN_UP.index(label) == ROMAN_UP.index(prev) + 1):
                 self._sub("uroman", f"({label})", m.group(2))
                 return
+        if (m := UPPER_LETTER.match(raw)) and self._upper_letter(m.group(1), m.group(2)):
+            return
         if (m := LOWER.match(raw)) and len(self.stack) > 1:
             label = m.group(1)
             kind = self._expected_lower(label)
             if kind:
                 self._sub(kind, f"({label})", m.group(2))
                 return
+        if (m := BARE_LETTER.match(raw)) and len(self.stack) > 1 and self._expected_lower(m.group(1)) == "letter":
+            self._sub("letter", f"({m.group(1)})", m.group(2))
+            return
         if len(self.stack) > 1:
             node = self.stack[-1]
             if not node.lines and not node.heading and node.absolute:
@@ -203,18 +230,62 @@ class Parser:
         if text:
             node.lines.append(text)
 
-    def _accept_top(self, label: str) -> bool:
+    def _accept_top(self, label: str, bare: bool = False) -> bool:
+        """The next clause number, a little ahead at most. A number alone on its line may jump further,
+        so the parser picks the numbering up again after OCR has lost some ("4." then "15.", L02)."""
         key = _num_key(label)
         prev = self.last_top
-        ok = key[0] <= 3 if prev is None else (prev < key and key[0] <= prev[0] + 3)
+        ok = key[0] <= 3 if prev is None else (prev < key and key[0] <= prev[0] + (12 if bare else 3))
         if ok:
             self.last_top = key
         return ok
+
+    def _combined(self, num: str, dot: bool, sub: str, text: str | None) -> bool:
+        """'14.(ii) The plot...': clause 14 and its sub-clause (ii) on one line (L17).
+
+        It continues a list already open in the current clause, or starts a new clause with "(i)" or "(a)";
+        a new clause needs the dot, so a line that only begins with a reference ("14(a) in any manner...")
+        stays text."""
+        top = self.stack[1] if len(self.stack) > 1 else None
+        if top is not None and top.label == self.prefix + num:
+            kind = self._expected_lower(sub)
+            if kind and self._in_stack(kind) is not None:
+                self._sub(kind, f"({sub})", text)
+                return True
+            return False
+        if dot and sub in ("i", "a") and not self.articles and self._accept_top(num):
+            self._top(num, "")
+            self._sub("roman" if sub == "i" else "letter", f"({sub})", text)
+            return True
+        return False
+
+    def _upper_letter(self, label: str, text: str | None) -> bool:
+        """'A. THIS DEED WITNESSETH AS UNDER' starts a lettered part of the deed (L19);
+        'A.' inside a clause starts sub-clause (A) (L09, L13)."""
+        caps = bool(text) and text.upper() == text and bool(re.search(r"[A-Z]{3}", text))
+        if text and not caps:  # a sentence or a name ("A. Murugan"), not a marker
+            return False
+        top = self.stack[1] if len(self.stack) > 1 else None
+        if top is None or top.kind == "ltop":
+            prev = top.label[-1] if top is not None else None
+            if caps and (label == "A" if prev is None else ord(label) == ord(prev) + 1):
+                self._top(label, text, kind="ltop")
+                return True
+            if top is None:
+                return False
+        i = self._in_stack("uletter")
+        prev = self.stack[i].label.strip("()") if i is not None else None
+        if label == "A" if prev is None else ord(label) == ord(prev) + 1:
+            self._sub("uletter", f"({label})", text)
+            return True
+        return False
 
     def _accept_dotted(self, label: str) -> bool:
         """A dotted number belongs under the current top-level clause, or starts one in a deed numbered 1.1, 1.2..."""
         head = _num_key(label.split(".")[0])
         prev = self.last_top
+        if self.articles:
+            return prev == head  # "4.9" under ARTICLE 4 only
         if label in ("1.0", "1.1") and prev is not None and prev > head:
             prev = None  # numbering restarts after a numbered list of representations or recitals (P04)
         if prev is None:
@@ -229,6 +300,7 @@ class Parser:
     def lease(self) -> Lease:
         clauses: list[Clause] = []
         seen: dict[str, int] = {}
+        self.order = []
 
         def full_text(node: Node) -> str:
             parts = [" ".join(node.lines)]
@@ -236,7 +308,7 @@ class Parser:
                 parts.append(f"{ch.label} {full_text(ch)}" if not ch.absolute else f"{ch.label.split('.')[-1]} {full_text(ch)}")
             return re.sub(r"\s+", " ", " ".join(p for p in parts if p)).strip()
 
-        def walk(node: Node, base: str) -> None:
+        def walk(node: Node, base: str, depth: int = 1) -> None:
             for ch in node.children:
                 cid = ch.label if ch.absolute else base + ch.label
                 key = cid
@@ -247,7 +319,8 @@ class Parser:
                     seen[key] = 1
                 ch.cid = f"{self.lease_id}-{cid}"
                 clauses.append(Clause(clause_id=ch.cid, number=cid, heading=ch.heading, text=full_text(ch)))
-                walk(ch, cid)
+                self.order.append((cid, depth, ch))
+                walk(ch, cid, depth + 1)
 
         preamble = re.sub(r"\s+", " ", " ".join(self.root.lines)).strip()
         if preamble:
@@ -323,14 +396,36 @@ def operative_start(lines: list[str]) -> int:
     return 0
 
 
-def parse_lease(text: str, lease_id: str) -> Lease:
+def _parse(text: str, lease_id: str) -> tuple[Parser, Lease]:
     p = Parser(lease_id)
     lines = text.splitlines()
     start = operative_start(lines)
     p.root.lines += [ln.strip() for ln in lines[:start] if ln.strip()]
-    for line in lines[start:]:
-        p.feed(line)
-    return p.lease()
+    for i in range(start, len(lines)):
+        p.line = i
+        p.feed(lines[i])
+        for node in p.stack[1:]:
+            if node.start < 0:
+                node.start = i
+    return p, p.lease()
+
+
+def parse_lease(text: str, lease_id: str) -> Lease:
+    return _parse(text, lease_id)[1]
+
+
+def clause_spans(text: str, lease_id: str) -> dict[str, tuple[int, int]]:
+    """Clause number -> (first line, line after its last line, sub-clauses included), in the lines of `text`.
+
+    A clause runs until the next clause that is not one of its sub-clauses, so text inserted at its end
+    line comes straight after it (used to write test clauses into a deed, src/graph/items.py)."""
+    p, _ = _parse(text, lease_id)
+    n = len(text.splitlines())
+    spans = {}
+    for k, (number, depth, node) in enumerate(p.order):
+        end = next((nd.start for _, d, nd in p.order[k + 1 :] if d <= depth), n)
+        spans[number] = (node.start, end)
+    return spans
 
 
 def main(argv=None):
