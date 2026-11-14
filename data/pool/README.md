@@ -1,6 +1,8 @@
 # Item pool: 20 more leases
 
-20 real, executed Indian commercial lease deeds, with 70 clauses to label (PLAN.md section 13, "collect 15–20 more leases"). Sources, parties and dates are in `../sources.csv` (`use` = `pool`).
+20 real, executed Indian commercial lease deeds, with 70 clauses to label (PLAN.md section 13, "collect 15–20 more leases"). Sources, parties and dates are in `../sources.csv` (`use` = `test`).
+
+**These 70 items are part of the test set** (decided 14 Nov 2026), and the 20 deeds host the 270 new test items as well (`../test/`). They stay out of dev and training.
 
 | ID | City | Year | Items |
 |---|---|---|---|
@@ -90,5 +92,9 @@ The BP-7 hand-off items and the TL-6 items leave out the elements that none of t
 
 ## Still to do
 
-1. Commit the answer key as it stands, and never edit it afterwards (PLAN.md section 13). Changes after the lawyer's review, including the four disagreements above, go in a separate corrections file.
-2. Decide whether these items go to test or dev. PLAN.md section 9 says test items are drafted with an open model, so B2 is never scored on clauses a frontier model wrote. The 25 unchanged clauses are not affected.
+1. ✅ The answer key is committed as it stands and is never edited afterwards (PLAN.md section 13). Changes go in `corrections.jsonl` (`{"item_id", "set": {field: value}, "reason", "source"}`). It holds:
+   - PO-48's clause id: the parser numbers L13's lettered sub-clauses `12(J)`, not `12.J`.
+   - The four disagreements above, settled by the lawyer's answer. PO-14, PO-24 and PO-66 become void under s.28(b). PO-65 becomes valid under Exception 1 to s.28, as a bar on proceedings.
+   - PO-37 and PO-64: `effect_on_expiry` changes from `claim_barred` to `none`. A three-year time to sue does not cut the right to sue, as in DA-08. The verdicts are unchanged.
+2. ✅ The 20 deeds are parsed into `../leases/L01.json`–`L20.json`, and every pool item points to a parsed clause (tested).
+3. ✅ The pool items go to test. PLAN.md section 9 says test items are drafted with an open model, so B2 is never scored on clauses a frontier model wrote. The 25 unchanged clauses are not affected.
