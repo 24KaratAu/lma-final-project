@@ -589,3 +589,13 @@ Both totals are about nine hours a day from Fri 6 to Fri 13 Nov. That does not f
 - **Second labeller:** the lawyer. If the lawyer cannot label every test item, the lawyer labels a blind 40-item sample spread over the three types and both forms, and the report gives that agreement figure and says the rest is single-labelled.
 - **Merging:** each of us merges our own PRs after the merge checklist passes; a change in the other person's folders needs their OK in the PR.
 
+
+### H3 margin (agreed 15 Nov 2026, before any run on `test-v1`)
+
+The proposal left the H3 margin to be fixed after the pilot. Avnish and Saksham agreed it on 15 Nov 2026, after the freeze and before any baseline or system had run on the test set.
+
+- **Margin: 0.05 defect F1.** H3 holds if the full system's defect F1 on `test-v1` is at least B2's defect F1 minus 0.05.
+- **B2** is the frontier baseline with no retrieval, as in the proposal's baseline table (`B2-none` in `src/eval/run_all.py`).
+- **The full system** is the small open model with the tuned adapter, graph retrieval, the element check and the agent loop, in the configuration chosen on dev (`agent-controller` in `src/eval/run_all.py`).
+- The decision uses the point estimates over all 340 items. The report also gives the 95% bootstrap interval of the difference.
+- **Why 0.05:** the test set has 154 void items, so sampling noise alone moves defect F1 by about ±0.02–0.03, and a smaller margin would pass or fail by chance. On dev, the untuned open model was 0.08 F1 behind B2 (Opus, no retrieval: 0.90).
