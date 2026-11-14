@@ -1,6 +1,6 @@
 # Test set
 
-**Status (15 Nov 2026):** built, **not yet frozen**. The 340 items are in `items.jsonl`. The lawyer has answered T1–T6 and settled the doubtful items in Session 2, and the corrections are applied. Only the freeze and the `test-v1` tag remain.
+**Status (15 Nov 2026):** **frozen**, tagged `test-v1`. The 340 items are in `items.jsonl`. The lawyer answered T1–T6 blind and settled the doubtful items in Session 2, and the corrections are applied. Nothing in this folder changes after the freeze (PLAN.md section 11).
 
 ## What is in it
 
@@ -57,17 +57,20 @@ The dev and pool keys label DV-10, PO-68 and PO-59 the same way.
 
 ## Rules
 
-- **Before the freeze, only Saksham opens this folder.** These files live on the `data/test-set` branch and reach `main` only at the freeze, because Avnish builds and tunes the system from `main` (PLAN.md section 14).
-- **The answer key is never edited.** `build` refuses to change a keyed item; later changes go in `corrections.jsonl` (PLAN.md section 13).
+- **Frozen at `test-v1`.** Nobody edits this folder after the freeze: not the items, the keys, the corrections or the planted deeds. Final numbers come only from `test-v1` (PLAN.md sections 10 and 11).
+- **Until the freeze, only Saksham opened this folder.** The files stayed off `main` until the freeze, because Avnish builds and tunes the system from `main` (PLAN.md section 14). Tuning stays on the dev set after the freeze too.
+- **The answer key is never edited.** `build` refuses to change a keyed item; changes after the lawyer's review went in `corrections.jsonl` (PLAN.md section 13).
 
 ## Next steps
 
 1. ✅ **Lawyer.** T1–T6 answered (`../../docs/legal/test_T<n>_answers.csv`).
 2. ✅ **Corrections.** The 10 verdicts that differed are in `corrections.jsonl`.
 3. ✅ **Session 2.** The 13 items above and PO-42 are settled, and `corrections.jsonl` records the outcome (source: the Batch and Session 2). The judgment summaries are still to go to the lawyer (`../../docs/legal/session2_review.md`, point 5).
-4. **Freeze.** Run `python -m src.graph.items items --include data/pool`, which rewrites `items.jsonl` from the keys plus corrections. Then tag `test-v1` and merge into `main`.
+4. ✅ **Freeze.** `items.jsonl` was rebuilt with `python -m src.graph.items items --include data/pool` (the keys plus corrections), merged into `main` and tagged `test-v1` on 15 Nov 2026.
 
 ## Changing or adding items
+
+Not after the freeze. Any later change would be a new version (`test-v2`) with its own tag, and results on the two versions are not comparable. How it was done:
 
 Edit `worksheet.csv` (one row per item) and rebuild with `python -m src.graph.items build --batch <new batch> [--check]`. `build` writes the kept clauses of every keyed batch, plus the new one, into copies of the host deeds. It checks that each clause landed under its number in the parse, that the labels are valid, and that dev and pool items still resolve. Then it appends the batch to the key.
 
