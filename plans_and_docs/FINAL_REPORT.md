@@ -6,8 +6,6 @@
 
 Numbers marked **dev** are on the 61-item dev set, where every choice was made. Numbers marked **test** are on the frozen test set `test-v1` (340 items), which was run once per configuration after the freeze.
 
-> **Draft status (15 Nov, 17:30).** Sections 1 and 5 to 9 are complete, with all eight configurations run on the test set. Sections 2, 3, 4 and 8.2 are Saksham's and are marked.
-
 ---
 
 ## 1. Question and hypotheses
@@ -31,13 +29,98 @@ The premise behind the proposal, that frontier models miss these defects, did no
 
 ## 2. Dataset
 
-*Saksham's section: leases and sources, the item families, how the 340 test items were written into 20 real deeds, dev and test composition.*
+### 2.1 Leases
 
-For reference by the later sections, the test set has 340 items: 154 void, 113 valid and 73 hand-off; 100 restraint of trade, 102 bar on proceedings, 100 time limit and 38 out of scope; 241 single-clause and 99 cross-clause. The dev set has 61 items (26 void).
+We collected 28 deeds (`data/sources.csv`). 27 are executed Indian commercial leases filed as exhibits with the US SEC (EDGAR); one is a public-sector lease template with blanks. HTML was converted to plain text and the filing headers removed; the wording is unchanged.
+
+| Use | Deeds | What they hold |
+|---|---|---|
+| Pilot and dev | P01–P05, S01–S03 | The 61 dev items |
+| Test | L01–L20 | The 340 test items |
+
+The 20 test deeds were executed between 2004 and 2024 in ten cities, and run from 2,700 to 29,100 words (about 264,000 in all, with the test clauses in). No deed is used in more than one set, and none is in the training pairs, which are synthetic (section 6.1).
+
+### 2.2 Items
+
+An item is one clause of a deed, with its verdict (void, valid or hand off), the provision, the facts the lawyer's checklist asks for, and the evidence path. Items are of three types, plus clauses outside ss.27–28 that the system should hand off:
+
+| Type | Provision | Example of a void clause | Example of a look-alike |
+|---|---|---|---|
+| Restraint of trade | s.27 | No similar business within 3 km for two years after the lease ends | The premises may be used only as an office |
+| Bar on proceedings | s.28(a), first limb | The Lessor's decision is final and cannot be questioned in any court | Disputes shall be referred to arbitration |
+| Time limit | s.28(a), second limb, and s.28(b) | Claims not notified within 30 days are deemed waived | Defects shall be notified within 30 days |
+| Out of scope | – | – | Forfeiture of the deposit, caps on liability |
+
+Each item belongs to one of 24 **phrasing families** (RT-1 to RT-5, BP-1 to BP-7, TL-1 to TL-6, OOS-1 to OOS-6), so results can be read by pattern. An item is **cross-clause** when the verdict depends on another clause of the same deed: a defined term ("Non-Compete Period"), the term of the lease, or the deed's arbitration clause.
+
+| Set | Items | Void | Valid | Hand off | Restraint of trade | Bar on proceedings | Time limit | Out of scope | Single clause | Cross-clause |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Dev | 61 | 26 | 24 | 11 | 20 | 20 | 20 | 1 | 42 | 19 |
+| Test (`test-v1`) | 340 | 154 | 113 | 73 | 100 | 102 | 100 | 38 | 241 | 99 |
+
+### 2.3 How the items were written
+
+- **Dev (61).** The 20 pilot clauses were written by hand into P01–P05, and 41 more (DV-01 to DV-20, DA-01 to DA-21) into S01–S03.
+- **Test, pool items (70, PO-01 to PO-70).** 25 are the deeds' own wording, unchanged. The other 45 were written by the team into copies of the deeds.
+- **Test, new items (270, TE-001 to TE-270).** These were written into the same 20 deeds, 9 to 19 per deed, in each deed's own numbering and party names. `src/graph/items.py` writes each clause into a copy of its host deed and checks that it parses under its number.
+
+**The 270 new clauses and their answer-key labels were written by Claude Opus 5.5**, from a specification of the family, the verdict, the form and the host deed, following the lawyer's Session 1 rulings. The plan was to draft them with an open model and edit them by hand (PLAN.md section 9), precisely so that the frontier baseline would not be scored on clauses a frontier model wrote; there was no time left to do that. Two consequences:
+
+1. **B2 is the same model that wrote 270 of the 340 test clauses.** The table gives the two no-retrieval baselines on the two parts separately. B2's lead over the small model is not larger on the clauses it wrote (0.041 F1) than on the pool (0.069), so we see no sign that authorship helped it. The pool has only 27 void items, so the comparison is rough.
+
+   | Run | Defect F1, 270 new items | Defect F1, 70 pool items | Accuracy, 25 unchanged real clauses |
+   |---|---|---|---|
+   | B1-none | 0.833 | 0.857 | 0.72 |
+   | B2-none | 0.874 | 0.926 | 0.84 |
+
+2. **The labels of the new items do not rest on the model.** The lawyer labelled all 270 blind, and the lawyer's answer decides (section 3).
+
+None of the 25 unchanged real clauses is void, so **every void item in the test set is a clause written into a deed**, not one found in it. The results say how the systems handle defects of the kinds the lawyer described, placed in real deeds; they do not say how often real deeds contain them.
+
+### 2.4 Keeping the test set apart
+
+Until the freeze only Saksham opened the test folder, and it stayed off `main`, where the system was built and tuned. The set was frozen and tagged `test-v1` on 15 Nov 2026, after the lawyer's answers and before any model ran on it. Every choice (prompts, retrieval settings, controller variant, adapter size) was made on dev.
 
 ## 3. Validation of the labels
 
-*Saksham's section: blind labelling by a practising lawyer, agreement (260 of 270 verdicts and 266 of 270 sections on the new items), Session 2, corrections, the rulings sheet.*
+A practising lawyer checked the rules and labelled every item. The lawyer's written answers are in `docs/legal/`.
+
+**Session 1: the rules.** Before any item was labelled, the lawyer reviewed the three types, the look-alikes and the fact checklists, corrected them (for example, a goodwill restraint without local limits is void; an expert's "final and binding" certificate on a question of fact is a hand-off, not void) and listed 18 leading judgments. The element checklists in PLAN.md section 6 are the corrected version, signed off by the lawyer.
+
+**Blind labelling.** For each batch the lawyer received the deeds and a blank sheet naming the clauses, never the answer key, and returned a verdict, the section or exception, and a reason for every clause.
+
+| Batch | Items | Verdict agrees with the key | Section agrees |
+|---|---|---|---|
+| Pilot (dev) | 20 | 20 | 20 |
+| Batch A (dev) | 41 | 41 | 41 |
+| Batch B (test, pool items) | 70 | 66 | 69 |
+| T1–T6 (test, new items) | 270 | 260 | 269 |
+| **Test set, all** | **340** | **326 (95.9%)** | **338 (99.4%)** |
+
+On the test set, Cohen's kappa for the verdict is **0.936** (95% bootstrap interval 0.904 to 0.967; `docs/legal/agreement.md`, `src/graph/agreement.py`). Counting the exception as well as the section, 334 of 340 agree (266 of the 270 new items).
+
+| Group | Items | Verdict agrees | Kappa |
+|---|---|---|---|
+| Restraint of trade | 100 | 100 | 1.00 |
+| Bar on proceedings | 102 | 91 | 0.82 |
+| Time limit | 100 | 97 | 0.94 |
+| Out of scope | 38 | 38 | – |
+| Single clause | 241 | 234 | 0.96 |
+| Cross-clause | 99 | 92 | 0.88 |
+
+**Where they differed, and Session 2.** All 14 differences are under s.28, 11 of them bars on proceedings. The lawyer settled each one in a second written session. The lawyer's blind answer became the label in 11, Session 2 gave a third answer in 3, and the key prevailed in none. The answer key is never edited: the changes are in `corrections.jsonl` (17 entries over the pool and the new items, three of which fix a clause id or an element and change no verdict), and `items.jsonl` applies them. Session 2 also gave three rules that the whole set follows:
+
+- **Exclusive courts of another city:** valid if the premises are there; hand off if something in the deed (a party's office, the place of signing or payment) connects the city; void if nothing does.
+- **Exception 1 or s.28:** a clause that is valid because the dispute can go to arbitration cites Exception 1; one that is valid because the courts stay open cites s.28.
+- **s.28 or out of scope:** a clause is under s.28 if it deals with who decides a claim, where, or by when, even when it is valid. It is out of scope only if it deals with what can be recovered.
+
+**Rulings.** The lawyer also checked the 17 one-sentence holdings in the statute graph and corrected three (section 4.1).
+
+**How to read the agreement figure.**
+
+- **Part of it is by construction.** The 270 new items were written to follow the lawyer's Session 1 rulings and the reasons on the earlier batches. The 70 pool items are the more independent test: on those, kappa is 0.914 (0.827 to 0.979).
+- **One lawyer.** There is no second legal opinion, so the figure measures agreement between our key and one practitioner, not agreement among lawyers.
+- **Thirteen of the 270 labels deliberately differ from what the decision rules in `src/models/verify.py` give**, because the law goes further than the rules (for example, seven goodwill restraints that fail a condition of Exception 1 to s.27). The system is scored against the lawyer's label, not against its own rules.
 
 ## 4. Statute graph and retrieval
 
@@ -369,10 +452,42 @@ The two give the model different evidence. The agent passes the sections with th
 - **Synthetic training pairs** come from the same 7B model that is then tuned, checked by rules and not by a lawyer.
 - **B2 ran in parts.** Both B2 runs stopped at a usage limit and were resumed; B2-none's two parts ran at two commits that differ only in files it does not use (the note is kept with the run).
 - **The test deeds are public SEC exhibits**, so a frontier model may have seen them in training. The planted clauses are new.
+- **The frontier baseline is the model that wrote 270 of the 340 test clauses** and their first labels (section 2.3). The lawyer labelled all of them blind, and B2 is reported on the two parts separately, but the baseline and the test set are not independent.
+- **Every void test item is a clause written into a deed.** The 25 unchanged real clauses are all valid or hand-off (section 2.3).
+- **One lawyer** labelled the items; there is no second legal opinion (section 3).
 
 ### 8.2 Hard cases and legal commentary
 
-*Saksham's section: ten worked hard cases and the retrieval error analysis.*
+This section looks item by item at the five single-pass runs (B1-none, B1-flat, B1-graph, B2-none, B2-flat). 195 of the 340 items are answered correctly by all five, and **21 are answered wrongly by all five**: 11 bars on proceedings, 6 restraints of trade, 3 time limits and 1 out-of-scope clause. Ten of them follow, with the lawyer's reason.
+
+| # | Item | The clause | Label and the lawyer's reason | What the models said |
+|---|---|---|---|---|
+| 1 | TE-003 (L14 cl. 12A) | "Any case about this lease must be filed in Ahmedabad and nowhere else." | **Void**, s.28(a). The premises are at Mundra, the Lessor at Gandhidham and the Lessee at Ghaziabad. Nothing in the deed connects Ahmedabad, and parties cannot give jurisdiction to a court that has none (*A.B.C. Laminart*). | Small model: valid. Frontier model: hand off. |
+| 2 | PO-26 (L07 cl. 22, the deed's own wording) | The civil courts at Gurgaon and the Punjab and Haryana High Court "alone shall have jurisdiction". | **Valid**, s.28. The premises are in Gurgaon, so these courts have jurisdiction anyway. | All five: hand off. |
+| 3 | PO-32 (L09 cl. 7(d)) | No financial data aggregation business within 3 km "during the Non-Compete Period". | **Void**, s.27. Clause 1(A)(x) defines the period as two years starting when the term ends, so it is a post-lease restraint with no goodwill sold. | Small model: valid. Frontier model: hand off. |
+| 4 | PO-43 (L12 Art. V(o)) | The Lessor shall not let other space in the centre to the Lessee's competitors during the term and for one year after it. | **Hand off**, s.27. During the term it is the Lessor dealing with its own property; the year after the term is the doubtful part. | All five: void. |
+| 5 | TE-194 (L09 cl. 10A) | A jointly appointed surveyor's certificate of the area "shall be final and binding". | **Hand off**, s.28. An agreed way of fixing a fact. The courts are not expressly excluded and the deed's arbitration clause remains. | All five: valid. |
+| 6 | PO-59 (L17 cl. 26, the deed's own wording) | A cost fixed by the Lessor "cannot be questioned in any Court of law". | **Hand off**, s.28(a). Clause 35 sends "any question of dispute" to arbitration. If it reaches this cost, a forum remains; if not, the clause is void. The two must be read together. | Four: void. One: valid. |
+| 7 | TE-220 (L20 cl. 2A) | Disputes "may, if both parties so agree at the time", go to arbitration; no suit in any court. | **Hand off**, s.28(a). Alone it is void ("may" is not an agreement to arbitrate, *Jagdish Chander*). But clause 23A says disputes "shall" be arbitrated, and which of two contradictory clauses prevails is for a court. | Four: void. One: valid. |
+| 8 | TE-071 (L17 cl. 25A) | Goodwill is transferred; the seller will not carry on a like business in Siruseri for seven years "whether or not" the buyer continues. | **Void**, s.27. Exception 1 saves a goodwill restraint only for as long as the buyer carries on the business. | Three: hand off. Two: valid. |
+| 9 | TE-209 (L01 Art. XII(f)) | "No suit ... shall be instituted after the Limitation Date." | **Valid**, s.28. Clause I(g) defines the date as three years from the cause of action, the same as the Limitation Act period for money claims. | Small model: void. Frontier model: hand off. |
+| 10 | TE-140 (L17 cl. 2A) | The Lessor may apply the deposit to sums due "in the opinion of" the Lessor. | **Valid**, s.28. The opinion is not made final and no forum is excluded. Our own key had this as out of scope; the lawyer corrected it. | All five: hand off. |
+
+What the ten have in common:
+
+- **The answer is in the rest of the deed, and it is a fact, not a definition.** Cases 1 and 2 turn on where the premises and the parties are, which is in the preamble and the schedule. No link in the parsed lease points there, and no tool fetches it. Five of the 21 items are of this kind (BP-3).
+- **Hand-off labels mark real doubt, and both models resolve it.** In cases 4 to 7 the lawyer's answer is that a court would have to decide. The models pick the side the wording suggests: void for an absolute-sounding bar, valid for a neutral-sounding surveyor clause. Eight of the 21 are hand-off items.
+- **The two models fail differently on the same clause.** In cases 1, 3 and 9 the small model commits to an answer and the frontier model hands off. This is the pattern in section 7.4: the frontier model's misses are refusals, the small model's are wrong verdicts.
+- **A convention costs both models some items.** A clause that looks like a time limit but limits no claim (a rent due date) is labelled valid under s.28, not out of scope. All five runs hand off two such items (TE-106, TE-182), which is a sensible answer that the scoring counts as wrong.
+
+**Retrieval and the verdict, item by item (B1-graph against B1-flat and B1-none, test).** Section 4.6 shows where graph retrieval misses. These figures show what happened to the verdict when it did not miss.
+
+- **Finding the provision did not improve the verdict.** On the 198 items where graph retrieval put the gold provision in the top 5, B1-graph is right on 74%; the same model with no retrieval is right on 79% of those same items. On the 104 where it did not, the two are level (66% and 67%).
+- **Finding the supporting clause did not either.** Graph retrieval fetched every supporting clause for 91 of the 99 cross-clause items. On those 91, accuracy is 0.71 with the clause in the prompt and 0.73 without it. Case 3 is an example: the definition of "Non-Compete Period" was in the evidence and the answer was still "valid".
+- **Graph against flat.** 36 verdicts differ: 13 move to the right answer and 17 away from it. False alarms rise from 23 to 31, and six of the eight extra ones are on hand-off items.
+- **The rulings may be part of this.** The two rulings most often attached (on 105 and 83 of the 340 items) are the pre-1997 time-limit cases, *Food Corporation of India* and *Sujir Ganesh Nayak*, which the lawyer warned govern only agreements made before 1997. They were attached even to restraint-of-trade clauses such as case 3. We did not run graph retrieval without rulings, so this is an observation and not a tested cause.
+
+The agent runs are compared with these in section 7.6 from their scores; their item-level answers are not part of this analysis.
 
 ---
 
