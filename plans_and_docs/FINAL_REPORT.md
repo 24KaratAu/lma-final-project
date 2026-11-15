@@ -6,7 +6,7 @@
 
 Numbers marked **dev** are on the 61-item dev set, where every choice was made. Numbers marked **test** are on the frozen test set `test-v1` (340 items), which was run once per configuration after the freeze.
 
-> **Draft status (15 Nov, 15:30).** Sections 5, 6, 7.1, 7.2 and 7.4 are complete. In section 7.3 the four baseline rows are final and the rows marked *pending* are still running. Sections 2, 3, 4 and 8.2 are Saksham's and are marked.
+> **Draft status (15 Nov, 17:30).** Sections 1 and 5 to 9 are complete, with all eight configurations run on the test set. Sections 2, 3, 4 and 8.2 are Saksham's and are marked.
 
 ---
 
@@ -19,11 +19,13 @@ The research question is whether a small open model (Qwen2.5-7B-Instruct, 4-bit,
 | | Hypothesis (proposal, section 3) | Result | Where |
 |---|---|---|---|
 | H1 | Grounding in the statute raises defect recall and lowers false alarms, against the ungrounded model | **Half supported:** false alarms fall, recall falls too | 7.4 |
-| H2 | Graph retrieval beats flat top-k, most on items that need an exception or a second clause | Retrieval: supported on dev. End to end: *pending (B1-graph)* | 4, 7.3 |
-| H3 | The tuned small model reaches defect F1 within a margin of the frontier single-pass baseline | *Pending (agent-controller).* The bar is 0.834 | 7.5 |
+| H2 | Graph retrieval beats flat top-k, most on items that need an exception or a second clause | **Supported for retrieval, mixed end to end:** the exact provision is found for 66% of items against 22%, but in the plain pipeline F1 is the same as flat (0.81); in the agent it is 0.03 higher, most on cross-clause items | 4, 7.6 |
+| H3 | The tuned small model reaches defect F1 within a margin of the frontier single-pass baseline | **Not supported:** 0.808 against 0.884, a gap of 0.076 where the margin was 0.05 | 7.5 |
 | H4 | Verifier accuracy levels off before 2,000 training pairs | **Not supported on dev:** accuracy is still rising at 2,000 | 6.3 |
 
 The premise behind the proposal, that frontier models miss these defects, did not survive the pilot (mid-submission, section 5.1: 9 of 9 planted defects found). The project therefore asks the narrower question above: how close a small, local, inspectable system gets.
+
+**The answer in one paragraph.** The untuned 7B model is already within 0.047 F1 of the frontier model (0.837 against 0.884). The best small-model configuration on the test set is the agent with its tools in a fixed order and **no** adapter (F1 0.842, false alarms 0.10). The two things we expected to close the gap, the tuned verifier and the model-driven controller, both looked better on dev and both were worse on test: the full system scores 0.808. The tuned verifier learned to hand clauses off. It gets 85% of the hand-off items right where the base model gets 37%, but it also hands off 42 valid and 28 void clauses. On cross-clause items every small-model configuration matches or beats the frontier model.
 
 ---
 
@@ -127,7 +129,7 @@ Each adapter is trained on the first N kept pairs, so the sets are nested.
 - **Citations improve early, then slip.** Citation accuracy jumps from 0.70 to 0.90 with 250 pairs and is 0.78 at 2,000.
 - **Caveats.** One seed per size, and 61 dev items: one item is 0.016 of accuracy, so the differences between neighbouring sizes are two or three items. The trend over four sizes is the evidence, not any single step.
 
-The 2,000-pair adapter is the verifier in every "adapter" configuration on the test set.
+The 2,000-pair adapter is the verifier in every "adapter" configuration on the test set. **The dev gain did not carry over to the test set** (section 7.6): there the adapter leaves accuracy unchanged and lowers F1, because it hands off far more clauses.
 
 ---
 
@@ -158,10 +160,10 @@ A **defect** is a clause whose gold verdict is void. Defect recall, precision an
 |---|---|---|---|---|---|---|---|---|
 | B1-none | 0.74 | 0.85 | 0.82 | **0.84** | 0.15 | 0.72 | – | 0.72 |
 | B1-flat | 0.71 | 0.79 | 0.84 | **0.81** | 0.12 | 0.68 | 0.22 | 0.66 |
-| B1-graph | *pending* | | | | | | | |
-| agent-fixed-noadapter | *pending* | | | | | | | |
-| agent-fixed | *pending* | | | | | | | |
-| **agent-controller** | *pending* | | | | | | | |
+| B1-graph | 0.70 | 0.81 | 0.80 | **0.81** | 0.17 | 0.70 | 0.66 | 0.69 |
+| agent-fixed-noadapter | 0.71 | 0.81 | 0.87 | **0.84** | 0.10 | 0.66 | 0.65 | 0.72 |
+| agent-fixed | 0.70 | 0.77 | 0.85 | **0.81** | 0.11 | 0.75 | 0.65 | 0.73 |
+| **agent-controller** (full system) | 0.70 | 0.81 | 0.81 | **0.81** | 0.16 | 0.76 | 0.13 | 0.69 |
 | B2-none | 0.81 | 0.84 | 0.93 | **0.88** | 0.05 | 0.95 | – | 0.69 |
 | B2-flat | 0.80 | 0.83 | 0.93 | **0.88** | 0.05 | 0.95 | 0.22 | 0.70 |
 
@@ -171,8 +173,23 @@ By defect type and form, defect F1 (accuracy in brackets):
 |---|---|---|---|---|---|
 | B1-none | 0.83 (0.68) | 0.87 (0.78) | 0.87 (0.78) | 0.84 (0.75) | 0.83 (0.72) |
 | B1-flat | 0.84 (0.65) | 0.83 (0.76) | 0.81 (0.72) | 0.83 (0.73) | 0.79 (0.66) |
+| B1-graph | 0.84 (0.67) | 0.85 (0.77) | 0.78 (0.69) | 0.81 (0.71) | 0.79 (0.69) |
+| agent-fixed-noadapter | 0.85 (0.66) | 0.88 (0.78) | 0.83 (0.72) | 0.83 (0.71) | 0.86 (0.72) |
+| agent-fixed | 0.80 (0.67) | 0.82 (0.69) | 0.82 (0.67) | 0.80 (0.69) | 0.83 (0.73) |
+| agent-controller | 0.83 (0.70) | 0.82 (0.70) | 0.80 (0.64) | 0.81 (0.71) | 0.80 (0.69) |
 | B2-none | 0.79 (0.73) | 0.89 (0.75) | 0.95 (0.90) | 0.94 (0.85) | 0.79 (0.69) |
 | B2-flat | 0.79 (0.72) | 0.89 (0.75) | 0.94 (0.89) | 0.93 (0.85) | 0.79 (0.70) |
+
+Share of items answered correctly, by gold verdict:
+
+| Run | Void (154) | Valid (113) | Hand-off (73) | Out-of-scope items (38) |
+|---|---|---|---|---|
+| B1-none | 0.85 | 0.83 | 0.36 | 0.66 |
+| B1-graph | 0.81 | 0.78 | 0.34 | 0.61 |
+| agent-fixed-noadapter | 0.81 | 0.81 | 0.37 | 0.66 |
+| agent-fixed | 0.77 | 0.50 | 0.85 | 0.89 |
+| agent-controller | 0.81 | 0.48 | 0.82 | 0.87 |
+| B2-none | 0.84 | 0.74 | 0.84 | 0.92 |
 
 ### 7.4 What the baselines show
 
@@ -186,11 +203,43 @@ By defect type and form, defect F1 (accuracy in brackets):
 
 Agreed and recorded before any test run (PLAN.md section 14): H3 holds if the full system's defect F1 is at least B2-none's minus 0.05, on the point estimates over all 340 items. B2-none's F1 is 0.8836, so the bar is **0.8336**.
 
-*Pending: agent-controller's F1, the difference, and its 95% paired-bootstrap interval from `src/eval/compare.py`.*
+| | Defect F1 |
+|---|---|
+| B2-none | 0.8836 |
+| agent-controller (full system) | 0.8078 |
+| Difference | **−0.076** (95% paired-bootstrap interval −0.127 to −0.025, 10,000 resamples) |
+
+**H3 is not supported.** The full system is 0.076 below the frontier baseline, outside the 0.05 margin, and the whole interval is below zero. The fixed-policy agent with the adapter gives the same picture (0.8095, difference −0.074, interval −0.124 to −0.026).
+
+The rule was fixed for the configuration chosen on dev, so that is the verdict. For the record, two configurations that were *not* the chosen one are inside the margin: the untuned model alone (B1-none, 0.837, difference −0.047) and the fixed-policy agent without the adapter (0.842, difference −0.042). We report them as observations, not as a pass: choosing either of them now would be choosing on the test set.
 
 ### 7.6 Ablations
 
-*Pending the agent runs: the adapter (agent-fixed against agent-fixed-noadapter), the controller (agent-controller against agent-fixed), and graph against flat retrieval (B1-graph against B1-flat, with Saksham's retrieval write-up).*
+Differences in defect F1 on the test set, with 95% paired-bootstrap intervals (`src/eval/compare.py`):
+
+| Ablation | Compared | Difference in F1 | 95% interval |
+|---|---|---|---|
+| The adapter | agent-fixed against agent-fixed-noadapter | −0.032 | −0.076 to +0.012 |
+| The controller | agent-controller against agent-fixed | −0.002 | −0.040 to +0.037 |
+| Graph search and lease links against flat retrieval | agent-fixed-noadapter against B1-flat | +0.030 | −0.001 to +0.062 |
+| The whole system against the bare model | agent-controller against B1-none | −0.029 | −0.083 to +0.025 |
+| Graph against flat retrieval in the plain pipeline | B1-graph against B1-flat | −0.006 | −0.039 to +0.027 |
+| The agent's evidence against graph retrieval in the plain pipeline | agent-fixed-noadapter against B1-graph | +0.035 | +0.007 to +0.065 |
+
+**The adapter did not help on the test set, and the reason is visible in the verdicts.** With the adapter the agent hands off 132 clauses; without it, 42. The adapter is right about hand-offs (85% of the gold hand-off items, against 37%) and about out-of-scope clauses (0.89 against 0.66), which the base model mostly decides when it should not. The price is that it also hands off 42 of the 113 valid clauses and 28 of the 154 void ones, so accuracy on valid clauses falls from 0.81 to 0.50 and defect recall from 0.81 to 0.77. On time limits it also raises more false alarms (0.13 to 0.28). On restraint of trade it does what it did on dev: precision 1.00 and no false alarms, with lower recall (0.66). Overall accuracy is unchanged (0.71 and 0.70) because the gains on hand-off items and the losses on valid items cancel.
+
+The same shift was there on dev, and we read it as a gain. On dev the adapter raised hand-offs from 4 to 20 of 61 clauses, got all 11 hand-off items right (from 3), and dropped accuracy on valid clauses from 0.88 to 0.62; accuracy rose from 0.72 to 0.79 because defect recall also rose (0.77 to 0.85). On the test set recall fell instead (0.81 to 0.77), so nothing paid for the lost valid clauses. Dev has 1 out-of-scope item and the test set 38, so dev could not show how much of the adapter's value is in refusing clauses outside ss.27–28. The adapter is better at knowing what it should not decide and worse at deciding. Citations are the one clear gain that carried over: 0.66 to 0.75.
+
+**The controller did not help either.** With the adapter as verifier, letting the model choose its tools gives the same F1 as the fixed order (0.808 and 0.810), with more false alarms (0.16 against 0.11) and a much lower exact provision recall@5 (0.13 against 0.65), because it reads the lease and seldom searches the statute. It used 3.5 steps per clause and ran out of budget once in 340. Its dev lead (F1 0.91) was measured with the base model as verifier and did not carry over.
+
+**H2: graph retrieval finds the right provision far more often, and that alone does not improve the verdicts.** Both graph-based configurations put the exact gold provision in the first five nodes for about 65% of items, where flat retrieval does for 22%. End to end the two differ:
+
+- **In the plain pipeline (B1-graph) the F1 is the same as flat** (0.807 against 0.812), on cross-clause items too (0.79 and 0.79), and false alarms are higher (0.17 against 0.12; 0.33 on cross-clause items). Better retrieval did not turn into better verdicts.
+- **In the fixed-policy agent without the adapter it is 0.030 higher than flat** (0.842 against 0.812; the interval just includes zero), and the gain is largest on cross-clause items (0.86 against 0.79), as H2 predicted. It also undoes the harm flat retrieval did to the bare model (0.837 to 0.812) while keeping a lower false-alarm rate (0.10 against B1-none's 0.15). It is 0.035 above B1-graph, and that interval excludes zero.
+
+The two give the model different evidence. The agent passes the sections with their exceptions and the clauses and definitions the target clause links to. Graph retrieval in the pipeline adds up to three court rulings and, by rule, the deed's arbitration and term clauses. We have not isolated which of these accounts for the difference; it fits the pattern in every other result here, that more legal text in the prompt makes the 7B model less accurate, but that is an explanation after the fact and not a tested one.
+
+**Cross-clause items.** Every small-model configuration is level with or above the frontier model here (0.80 to 0.86 against 0.79), and the fixed-policy agent without the adapter is 0.07 above it. On single clauses the frontier model is far ahead (0.94 against 0.80 to 0.84). The frontier model's lead is in reading one clause precisely; where the answer depends on another clause, reading that clause is what counts, and a small model given the clause does as well.
 
 ---
 
@@ -199,7 +248,8 @@ Agreed and recorded before any test run (PLAN.md section 14): H3 holds if the fu
 ### 8.1 Limitations
 
 - **One run per configuration.** Decoding is greedy, so a repeat gives the same answers for the open model; the frontier baseline has no seed and was run once. Training used one seed per size.
-- **The dev set is small** (61 items). The controller variant and the adapter size were chosen on it, and several of those choices rest on differences of two to four items.
+- **The dev set is small** (61 items). The controller variant and the adapter size were chosen on it, and several of those choices rest on differences of two to four items. Both choices turned out wrong on the test set (section 7.6). We did not change the system after seeing test results.
+- **The controller variant was chosen with the base model as verifier** and then run with the adapter. The combination was not measured on dev.
 - **The learning curve is on dev only.** Only the 2,000-pair adapter was run on the test set.
 - **Synthetic training pairs** come from the same 7B model that is then tuned, checked by rules and not by a lawyer.
 - **B2 ran in parts.** Both B2 runs stopped at a usage limit and were resumed; B2-none's two parts ran at two commits that differ only in files it does not use (the note is kept with the run).
@@ -221,7 +271,8 @@ Everything ran on free Kaggle sessions (2 × T4) and one laptop; no paid compute
 | QLoRA at 250, 500, 1,000 and 2,000 pairs | 16.1 (8.1 h wall) |
 | Dev runs of the agent (11 runs) | 11.5 |
 | Test runs, B1-none and B1-flat | 3.2 |
-| Test runs, agent (3 runs) and B1-graph | *pending* |
+| Test runs, agent (3 runs, 4.5 h wall) | 9.1 |
+| Test run, B1-graph | 1.8 |
 | B2 (frontier, laptop, no GPU) | 0 |
 
 Peak GPU memory was 11.9 GB in training and 9.5 to 13 GB for the agent runs on dev, spread over the two T4s. Each run folder has its `config.json` with the git commit, seed, platform, GPU type and GPU hours.
