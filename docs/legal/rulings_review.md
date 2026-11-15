@@ -1,8 +1,8 @@
 # Review of the ruling summaries
 
-The lawyer's written reply, 15 Nov 2026, to the 17 holdings in `../../data/statute/rulings.csv` (Session 2 asked for them, `session2_review.md` point 5). The numbers are the sheet's `RUL-` numbers. Greeting and a remark on the email's formatting left out.
+The lawyer's two written replies, 15 Nov 2026. The first is to the 17 holdings in `../../data/statute/rulings.csv` (Session 2 asked for them, `session2_review.md` point 5); the second, after the changes, is the sign-off at the end. The numbers are the sheet's `RUL-` numbers. Greeting and a remark on the email's formatting left out.
 
-**Changes to the sheet (made 15 Nov):** No. 5 takes the judgment's wording. No. 15 adds that it overruled *Himangni*, and No. 18 adds that the ruling applies prospectively, both in the lawyer's words below. No. 1 stays unread. Nos. 4 and 10 keep their sentences. The rest need no change. The lawyer signs off the revised sheet.
+**Changes to the sheet (made 15 Nov):** No. 5 takes the judgment's wording. No. 15 adds that it overruled *Himangni*, and No. 18 adds that the ruling applies prospectively, both in the lawyer's words below. No. 1 stays unread. Nos. 4 and 10 keep their sentences. The rest need no change. The lawyer checked the revised sheet and signed it off the same day (Sign-off, below).
 
 ---
 
@@ -31,3 +31,26 @@ Two cautions for the system:
 - **Nos. 2, 3, 6, 7, 9, 11–14, 16 and 17.** I have no corrections. Each states the holding correctly and no more.
 
 With these changes, please send me the revised sheet and I will sign it off.
+
+---
+
+## Sign-off (second reply, 15 Nov 2026)
+
+Thank you. I have checked the revised sheet against my last email.
+
+- No. 5 (Gujarat Bottling): correct. It now uses the same words as No. 3 (Golikari).
+- No. 15 (Vidya Drolia): correct. The note on Himangni Enterprises is the point lease drafters most need.
+- No. 18 (CORE): correct. The prospectivity point is now stated. Add the SCC citation when the case is reported. No further check from me is needed for that.
+- No. 1 (Madhub Chunder): treating it as known only through Percept D'Mark, and keeping it out of the system until you have read the report, is the right approach. If you read it later, send me that one sentence and I will check it.
+- Nos. 4 and 10: keep your sentences as they are.
+- The other twelve: no further comments.
+
+I am glad the cautions will go into your discussion of the system's errors. That is where they are most useful.
+
+On the acknowledgements: thank you for asking, but I would prefer not to be named. You may write "a practising advocate who reviewed the statutory provisions and the judgment summaries." Please don't add anything that would identify me.
+
+**Sign-off.** I have reviewed the summaries of Nos. 2 to 18 in the revised rulings sheet, together with the changes to Nos. 5, 15 and 18. They state the holdings correctly for the purposes of your project. No. 1 is excluded until it has been read. This covers how the summaries state each court's decision. It does not cover the system's outputs or any legal advice on a particular lease.
+
+---
+
+**For the report.** The lawyer is not named anywhere, and nothing is added that could identify them. The acknowledgement uses their words: "a practising advocate who reviewed the statutory provisions and the judgment summaries." The sign-off covers the 17 holdings (Nos. 2–18) as statements of each court's decision. It does not cover the system's outputs.
