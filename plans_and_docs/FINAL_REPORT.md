@@ -26,6 +26,45 @@ The premise behind the proposal, that frontier models miss these defects, did no
 
 **The answer in one paragraph.** The untuned 7B model is already within 0.047 F1 of the frontier model (0.837 against 0.884). The best small-model configuration on the test set is the agent with its tools in a fixed order and **no** adapter (F1 0.842, false alarms 0.10). The two things we expected to close the gap, the tuned verifier and the model-driven controller, both looked better on dev and both were worse on test: the full system scores 0.808. The tuned verifier learned to hand clauses off. It gets 85% of the hand-off items right where the base model gets 37%, but it also hands off 42 valid and 28 void clauses. On cross-clause items every small-model configuration matches or beats the frontier model.
 
+### 1.1 Related work
+
+**Legal NLP benchmarks.** LexGLUE (Chalkidis et al., 2022) and LegalBench (Guha et al., 2023) test models on many legal tasks. The closest in material are CUAD (Hendrycks et al., 2021) and ContractNLI (Koreeda and Manning, 2021), which are about contract review: finding clause types and deciding what a contract entails. For Indian law, ILDC (Malik et al., 2021) and IL-TUR (Joshi et al., 2024) work on court judgments, not contracts. None of them asks whether a clause is enforceable under a named statute, which provision decides it, or whether a lawyer should decide instead. Our test set asks all three, for two sections of one Act.
+
+**Grounding and hallucination.** Retrieval-augmented generation (Lewis et al., 2020) gives a model retrieved text to answer from. Studies of legal hallucination (Dahl et al., 2024; Magesh et al., 2024) find that general models and commercial retrieval-based legal tools still state wrong law with confidence. This is why our system must cite a provision and show its evidence path, and why the citation is scored separately from the verdict.
+
+**Graph-based retrieval.** GraphRAG (Edge et al., 2024) builds a graph over a corpus and retrieves through it. Our graph is small and built from the statute's own structure (sections, exceptions, explanations and rulings), with the lease's definitions and cross-references as a second graph. Flat retrieval is BM25 (Robertson and Zaragoza, 2009).
+
+**Tool-using agents.** ReAct (Yao et al., 2023) interleaves reasoning with tool calls, and Toolformer (Schick et al., 2023) teaches a model when to call a tool. Our controller is a ReAct-style loop; its "think" and "plan" variants test whether the reasoning step helps a 7B model (section 5.3: it made the model loop).
+
+**Small models and light fine-tuning.** The verifier is Qwen2.5-7B-Instruct (Qwen Team, 2024) with a LoRA adapter (Hu et al., 2022) trained in 4-bit with QLoRA (Dettmers et al., 2023), on synthetic pairs from the same model, filtered by rules.
+
+**Handing off.** When a model should defer to a person is studied as learning to defer (Madras et al., 2018). Here the hand-off is a third verdict that the lawyer also gives, so it is scored like the other two.
+
+**Evaluation.** Systems are compared with the paired bootstrap (Koehn, 2004; Berg-Kirkpatrick et al., 2012), and label agreement with Cohen's kappa (Cohen, 1960).
+
+**References**
+
+- Berg-Kirkpatrick, T., Burkett, D. and Klein, D. (2012). An empirical investigation of statistical significance in NLP. *EMNLP-CoNLL*.
+- Chalkidis, I., Jana, A., Hartung, D., Bommarito, M., Androutsopoulos, I., Katz, D. M. and Aletras, N. (2022). LexGLUE: A benchmark dataset for legal language understanding in English. *ACL*.
+- Cohen, J. (1960). A coefficient of agreement for nominal scales. *Educational and Psychological Measurement* 20(1).
+- Dahl, M., Magesh, V., Suzgun, M. and Ho, D. E. (2024). Large legal fictions: Profiling legal hallucinations in large language models. *Journal of Legal Analysis* 16(1).
+- Dettmers, T., Pagnoni, A., Holtzman, A. and Zettlemoyer, L. (2023). QLoRA: Efficient finetuning of quantized LLMs. *NeurIPS*.
+- Edge, D. et al. (2024). From local to global: A graph RAG approach to query-focused summarization. arXiv:2404.16130.
+- Guha, N. et al. (2023). LegalBench: A collaboratively built benchmark for measuring legal reasoning in large language models. *NeurIPS Datasets and Benchmarks*.
+- Hendrycks, D., Burns, C., Chen, A. and Ball, S. (2021). CUAD: An expert-annotated NLP dataset for legal contract review. *NeurIPS Datasets and Benchmarks*.
+- Hu, E. J. et al. (2022). LoRA: Low-rank adaptation of large language models. *ICLR*.
+- Joshi, A. et al. (2024). IL-TUR: Benchmark for Indian legal text understanding and reasoning. *ACL*.
+- Koehn, P. (2004). Statistical significance tests for machine translation evaluation. *EMNLP*.
+- Koreeda, Y. and Manning, C. D. (2021). ContractNLI: A dataset for document-level natural language inference for contracts. *Findings of EMNLP*.
+- Lewis, P. et al. (2020). Retrieval-augmented generation for knowledge-intensive NLP tasks. *NeurIPS*.
+- Madras, D., Pitassi, T. and Zemel, R. (2018). Predict responsibly: Improving fairness and accuracy by learning to defer. *NeurIPS*.
+- Magesh, V., Surani, F., Dahl, M., Suzgun, M., Manning, C. D. and Ho, D. E. (2024). Hallucination-free? Assessing the reliability of leading AI legal research tools. arXiv:2405.20362.
+- Malik, V. et al. (2021). ILDC for CJPE: Indian legal documents corpus for court judgment prediction and explanation. *ACL-IJCNLP*.
+- Qwen Team (2024). Qwen2.5 technical report. arXiv:2412.15115.
+- Robertson, S. and Zaragoza, H. (2009). The probabilistic relevance framework: BM25 and beyond. *Foundations and Trends in Information Retrieval* 3(4).
+- Schick, T. et al. (2023). Toolformer: Language models can teach themselves to use tools. *NeurIPS*.
+- Yao, S. et al. (2023). ReAct: Synergizing reasoning and acting in language models. *ICLR*.
+
 ---
 
 ## 2. Dataset
@@ -293,6 +332,34 @@ Three things came out of these runs.
 
 **Configuration taken to the test set (chosen on dev only):** the controller with the direct prompt and no opening search, with the 2,000-pair adapter as the verifier. This choice has a cost: the evidence path of this configuration seldom contains the statute text, so it is less "statute-grounded" than the fixed policy. The fixed policy with the adapter is reported next to it for that reason.
 
+### 5.4 Tool use on the test set (full system)
+
+The brief asks that the agent pick the right tools, pass valid arguments and recover from errors. These figures are from the full system's 340 test traces (`runs/test/agent-controller-test/traces.jsonl`).
+
+| | Test |
+|---|---|
+| Tool calls | 1,174 (3.5 per clause) |
+| Calls by tool | `lookup_definition` 340, `get_clause` 336, `expand` 270, `search_graph` 223 |
+| Clauses that used all 6 steps | 1 of 340 |
+| Malformed calls (no readable action, or arguments the tool does not take) | 7 (0.6%) |
+| Well-formed calls that found nothing | 162 (a term the lease does not define 158, a clause or statute node that does not exist 4) |
+| Repeats refused by the agent | 7 |
+| After an error, the next call succeeded | 150 of 168 (89%) |
+| Cross-clause items where the supporting clause was fetched | 81 of 99 (fixed policy: 84) |
+| Items whose provision (or its section) is in the evidence | 45 of 302 (fixed policy: 220) |
+
+**Valid arguments and recovery are good.** Under 1% of calls were malformed, and after a failed call the model almost always moved on to one that worked. Most failed calls are lookups of words that are not defined terms in that deed, such as the party names ("LESSEE" 16 times, "Lessee" 8, "LESSOR" 6) or general words ("arbitration" 11).
+
+**Choosing the tools is where it falls short.**
+
+- **It re-reads the clause it was given.** The clause is already in the prompt, yet the first call on 212 of 340 clauses fetches it again.
+- **It follows a routine.** 173 clauses (51%) get the same four calls in the same order: `get_clause`, `lookup_definition`, `search_graph`, `expand`. This is close to a fixed policy, which is why the controller and the fixed policy score the same (section 7.6).
+- **Its statute searches are generic.** 160 of the 223 searches name the Act or the sections ("Sections 27 and 28 Indian Contract Act 1872" 64 times) instead of describing the clause. BM25 matches these to the Act's opening sections (s.1 and s.15 are in the top three for almost all of them), so the provision that decides the clause is in the evidence for 45 of 302 items, against 220 for the fixed policy, which searches with the clause text.
+- **It expands s.27 by default.** `expand` was called on s.27 178 times and on s.28 66 times. On the 91 bar-on-proceedings and time-limit items where it expanded s.27, accuracy is 0.64, against 0.72 on the rest.
+- **The lease side works.** For cross-clause items it fetched the clause the answer depends on in 81 of 99, close to the fixed policy, which follows the lease's links.
+
+**Tool-call accuracy against gold traces (dev).** *Saksham: agreement with the 30 gold tool traces, scored against `runs/session1/runs/agent-direct-qwen7b-dev/traces.jsonl`. That is the dev run of this same controller set-up (direct prompt, no opening search; the planner is the base model in both).*
+
 ---
 
 ## 6. Fine-tuning the verifier
@@ -444,7 +511,7 @@ The two give the model different evidence. The agent passes the sections with th
 
 ---
 
-## 8. Error analysis and limitations
+## 8. Error analysis, limitations and future work
 
 ### 8.1 Limitations
 
@@ -490,7 +557,42 @@ What the ten have in common:
 - **Graph against flat.** 36 verdicts differ: 13 move to the right answer and 17 away from it. False alarms rise from 23 to 31, and six of the eight extra ones are on hand-off items.
 - **The rulings may be part of this.** The two rulings most often attached (on 105 and 83 of the 340 items) are the pre-1997 time-limit cases, *Food Corporation of India* and *Sujir Ganesh Nayak*, which the lawyer warned govern only agreements made before 1997. They were attached even to restraint-of-trade clauses such as case 3. We did not run graph retrieval without rulings, so this is an observation and not a tested cause.
 
-The agent runs are compared with these in section 7.6 from their scores; their item-level answers are not part of this analysis.
+The agent runs are compared item by item in section 8.3.
+
+### 8.3 Where the agents fail (test)
+
+Section 8.2 covers the five single-pass runs. This section looks at the three agent runs item by item.
+
+| Gold → predicted | Agent, fixed, no adapter | Agent, fixed, adapter | Full system (controller, adapter) |
+|---|---|---|---|
+| void → void | **125** | 119 | 124 |
+| void → valid | 29 | 7 | 8 |
+| void → hand off | 0 | 28 | 22 |
+| valid → valid | **91** | 57 | 54 |
+| valid → void | 7 | 14 | 20 |
+| valid → hand off | 15 | 42 | 39 |
+| hand off → hand off | 27 | **62** | 60 |
+| hand off → valid | 35 | 4 | 4 |
+| hand off → void | 11 | 7 | 9 |
+
+**The adapter trades valid and void clauses for hand-offs.** Adding the adapter to the fixed policy changes 118 verdicts. 47 become right, and 36 of those are hand-off items. 52 become wrong, and those are mostly valid (37) and void (14) clauses. In 90 of its 132 hand-offs the adapter calls the clause out of scope, and 56 of those 90 clauses are under s.27 or s.28. Out-of-scope pairs are the largest single family in the training pairs (OOS-1, 300 of 2,121 kept), which may be part of the reason; we did not test this.
+
+**Confidence cannot catch it.** The adapter gives a confidence of 0.9 on 329 of 340 answers (0.95 on the rest), so a confidence threshold could not separate its good hand-offs from its bad ones. The base model's confidences vary more (0.9, 0.95 and 1.0).
+
+**The controller and the fixed policy fail on different items, equally often.** With the same adapter they disagree on 43 items, and each is right on 19 of them. Section 5.4 shows why the controller gains nothing: it mostly runs the same routine, and its statute searches seldom find the provision.
+
+**The hard items.** On the 21 items all five single-pass runs get wrong (section 8.2), the agent without the adapter gets none right. The fixed agent with the adapter gets 5 right and the full system 7, 4 of them hand-off items in each case, which they get right because they hand off often. On the 195 items all five single-pass runs get right, the agent without the adapter gets 3 wrong, the fixed agent with the adapter 24 and the full system 27. Most of those are valid clauses, and most of the wrong answers are hand-offs (17 of 24, and 15 of 27).
+
+**Fetching the right clause is not enough.** On cross-clause items, the full system is right on 55 of the 81 where it fetched the clause the answer depends on, and on 13 of the 18 where it did not. This matches what section 8.2 found for graph retrieval: putting the supporting text in front of the 7B model does not, by itself, change its verdict for the better.
+
+### 8.4 Future work
+
+- **Calibrate the hand-off.** Train the verifier with fewer out-of-scope pairs and more valid look-alikes, give it a confidence that varies, and set a hand-off threshold on dev. This targets the 61 valid and void clauses the full system handed off.
+- **Better tool choice.** Search with the clause's own words instead of the Act's name, stop re-reading the target clause, and choose s.27 or s.28 from the clause. A planner trained on gold tool traces (only 30 exist) or on the fixed policy's choices could learn these.
+- **A tool for the deed's facts.** Five of the 21 hard items turn on where the premises and parties are, which sits in the preamble and schedule. No current tool fetches that.
+- **Filter the rulings** by date and section, so the pre-1997 time-limit cases are not attached to restraint-of-trade clauses (section 8.2).
+- **Route by form.** The agent without the adapter beats the frontier model on cross-clause items (F1 0.86 against 0.79), while the frontier model is far ahead on single clauses (0.94). Sending each clause to the system that is better for its form is untested.
+- **A fairer test set.** Void clauses found in real deeds, clauses drafted independently of the frontier model, a second lawyer, repeated frontier runs, and a larger open model under the same free compute.
 
 ---
 
