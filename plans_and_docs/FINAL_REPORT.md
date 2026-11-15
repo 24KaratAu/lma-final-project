@@ -256,6 +256,8 @@ The agent decides one clause at a time. It gathers evidence with four tools and 
 | `search_graph(query)` | Contract Act provisions by BM25, each section followed by its exceptions and explanations |
 | `expand(node_id)` | One hop from a statute node (its exceptions, explanations, the section it belongs to) or from a lease clause (the clauses it links to) |
 
+**Unsafe or unapproved actions: none are possible.** All four tools only read: the parsed lease and the statute graph, both held in memory. No tool writes a file, changes the lease, calls a network service or runs code, so there is no state-changing action to approve and the unsafe-action rate is 0 by construction, not by measurement. A call to a tool that does not exist, or with arguments the tool does not accept, is not executed: it returns an error message to the controller and is logged like any other call. The only output that reaches a user is the verdict, and a clause the verifier is unsure of is handed off to a lawyer.
+
 Every call is logged. Everything a call returns is kept as evidence. The controller sees each result cut to 600 characters; the verifier gets the full statute text and each lease clause cut to 1,500 characters. The evidence path lists statute nodes first, in the order found, then lease clauses.
 
 ### 5.2 Two policies
