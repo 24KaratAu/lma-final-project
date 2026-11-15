@@ -64,7 +64,7 @@ Each item belongs to one of 24 **phrasing families** (RT-1 to RT-5, BP-1 to BP-7
 - **Test, pool items (70, PO-01 to PO-70).** 25 are the deeds' own wording, unchanged. The other 45 were written by the team into copies of the deeds.
 - **Test, new items (270, TE-001 to TE-270).** These were written into the same 20 deeds, 9 to 19 per deed, in each deed's own numbering and party names. `src/graph/items.py` writes each clause into a copy of its host deed and checks that it parses under its number.
 
-**The 270 new clauses and their answer-key labels were written by Claude Opus 5.5**, from a specification of the family, the verdict, the form and the host deed, following the lawyer's Session 1 rulings. The plan was to draft them with an open model and edit them by hand (PLAN.md section 9), precisely so that the frontier baseline would not be scored on clauses a frontier model wrote; there was no time left to do that. Two consequences:
+**The 270 new clauses were drafted by Claude Opus 5.5**, with a draft answer key, from a specification of the family, the verdict, the form and the host deed, following the lawyer's Session 1 rulings. **The labels are the lawyer's, not the model's:** the lawyer labelled all 270 blind, and wherever the lawyer's answer and the draft key differed, the lawyer's answer decided (section 3). The plan was to draft them with an open model and edit them by hand (PLAN.md section 9), precisely so that the frontier baseline would not be scored on clauses a frontier model wrote; there was no time left to do that. Two consequences:
 
 1. **B2 is the same model that wrote 270 of the 340 test clauses.** The table gives the two no-retrieval baselines on the two parts separately. B2's lead over the small model is not larger on the clauses it wrote (0.041 F1) than on the pool (0.069), so we see no sign that authorship helped it. The pool has only 27 void items, so the comparison is rough.
 
@@ -73,7 +73,7 @@ Each item belongs to one of 24 **phrasing families** (RT-1 to RT-5, BP-1 to BP-7
    | B1-none | 0.833 | 0.857 | 0.72 |
    | B2-none | 0.874 | 0.926 | 0.84 |
 
-2. **The labels of the new items do not rest on the model.** The lawyer labelled all 270 blind, and the lawyer's answer decides (section 3).
+2. **The labels of the new items do not rest on the model.** The lawyer never saw the draft key, and where the two differed (10 of 270 verdicts) the draft key prevailed in none (section 3).
 
 None of the 25 unchanged real clauses is void, so **every void item in the test set is a clause written into a deed**, not one found in it. The results say how the systems handle defects of the kinds the lawyer described, placed in real deeds; they do not say how often real deeds contain them.
 
@@ -452,7 +452,7 @@ The two give the model different evidence. The agent passes the sections with th
 - **Synthetic training pairs** come from the same 7B model that is then tuned, checked by rules and not by a lawyer.
 - **B2 ran in parts.** Both B2 runs stopped at a usage limit and were resumed; B2-none's two parts ran at two commits that differ only in files it does not use (the note is kept with the run).
 - **The test deeds are public SEC exhibits**, so a frontier model may have seen them in training. The planted clauses are new.
-- **The frontier baseline is the model that wrote 270 of the 340 test clauses** and their first labels (section 2.3). The lawyer labelled all of them blind, and B2 is reported on the two parts separately, but the baseline and the test set are not independent.
+- **The frontier baseline is the model that drafted 270 of the 340 test clauses** (section 2.3). Their labels are the lawyer's blind answers, not the model's draft key, and B2 is reported on the two parts separately, but the baseline and the test set are not independent.
 - **Every void test item is a clause written into a deed.** The 25 unchanged real clauses are all valid or hand-off (section 2.3).
 - **One lawyer** labelled the items; there is no second legal opinion (section 3).
 
