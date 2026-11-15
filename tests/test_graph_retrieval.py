@@ -42,12 +42,29 @@ def test_a_clause_with_no_links_brings_no_lease_clauses():
     assert all(n["type"] != "lease_clause" for n in retrieve("L00-5", L00, mode="graph")["nodes"])
 
 
+def with_rulings(monkeypatch, *rulings):
+    """The statute graph with only these (id, provision, holding) rulings."""
+    nodes = {i: n for i, n in NODES.items() if n.type != "ruling"}
+    edges = tuple(e for e in EDGES if e.type != "interprets")
+    for rid, dst, holding in rulings:
+        nodes[rid] = StatuteNode(id=rid, type="ruling", label=f"Case {rid}", text=holding)
+        edges += (StatuteEdge(src=rid, dst=dst, type="interprets", source="manual"),)
+    monkeypatch.setattr(graph, "statute", lambda: (nodes, edges))
+
+
 def test_rulings_on_the_retrieved_provisions_follow_them(monkeypatch):
-    ruling = StatuteNode(id="RUL-07", type="ruling", label="Hakam Singh (1971) 1 SCC 286", text="Parties may choose a competent court.")
-    edges = (*EDGES, StatuteEdge(src="RUL-07", dst="ICA-28", type="interprets", source="manual"))
-    monkeypatch.setattr(graph, "statute", lambda: ({**NODES, "RUL-07": ruling}, edges))
+    with_rulings(monkeypatch, ("RUL-07", "ICA-28", "An agreement to sue in one of several courts with jurisdiction is valid."))
     path = retrieve("L00-19", L00, mode="graph", k=5)["path"]
     assert "ICA-28" in path[:5] and path[5] == "RUL-07"
+
+
+def test_the_ruling_that_matches_the_clause_comes_first_and_one_sharing_no_word_is_left_out(monkeypatch):
+    with_rulings(monkeypatch,
+                 ("RUL-10", "ICA-28", "Shortening limitation for a suit is void."),
+                 ("RUL-07", "ICA-28", "An agreement to sue in one of several courts with jurisdiction is valid."),
+                 ("RUL-09", "ICA-28", "Subject to the jurisdiction of the courts at Kolkata excludes other courts."))
+    path = retrieve("L00-19", L00, mode="graph", k=5)["path"]
+    assert [p for p in path if p.startswith("RUL-")] == ["RUL-09", "RUL-07"]
 
 
 def test_neighbours_go_both_ways_along_exceptions():

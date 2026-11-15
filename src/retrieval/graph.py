@@ -14,6 +14,13 @@ recall@5 0.75 (flat 0.27), section recall@5 0.75 (flat 0.78), exact@1 0.50 (flat
 the gold path found 0.75 (flat 0). Adding the lease text to the query made the seeds noisier (exact@5 0.68). The top k
 provisions come first in the path, so section recall@k reads only statute nodes (src/eval/score.py). Then come
 the rulings that interpret them (`interprets` edges, src/graph/rulings.py) and the lease clauses.
+
+Rulings: of those on the top provisions, the ones whose holding best matches the clause (BM25 on the holding),
+at most 3, and none that shares no word with it. Taking them in provision order instead gave every s.28 clause
+the three jurisdiction cases. Dev, 15 Nov (61 items, 17 rulings), items given a ruling of their own kind
+(s.27, jurisdiction, time limits, Exception 1): time limits 18/20 (in order: 0/20), court bars 17/20 (14/20),
+restraint 7/20 (8/20; s.27 itself is in the top 5 for only 9 of them). Adding the provision's score made it
+worse (28 against 42 in all); 1 or 2 rulings found fewer of the right kind (31, 39).
 """
 
 import re
@@ -22,7 +29,7 @@ from pathlib import Path
 
 from src.common.jsonl import read_jsonl
 from src.common.schemas import Clause, Lease, StatuteEdge, StatuteNode
-from src.retrieval.flat import STATUTE, bm25_index
+from src.retrieval.flat import STATUTE, FlatIndex, bm25_index
 
 EDGES = STATUTE.parent / "edges.jsonl"
 DISPUTE = re.compile(r"\b(courts?|suits?|disputes?|differences?|arbitrat\w*|tribunals?|jurisdiction|final|binding|conclusive|questioned)\b", re.I)
@@ -48,6 +55,16 @@ def neighbours(node_id: str, edges) -> list[str]:
 
 def rulings_of(node_id: str, edges) -> list[str]:
     return [e.src for e in edges if e.dst == node_id and e.type == "interprets"]
+
+
+def pick_rulings(text: str, provisions: list[str], nodes: dict, edges, m: int) -> list[str]:
+    """Rulings on the provisions, best BM25 match of the holding to the text first (ties: provision order)."""
+    cand = list(dict.fromkeys(r for p in provisions for r in rulings_of(p, edges) if r in nodes))
+    if not cand:
+        return []
+    held = [n.model_copy(update={"label": ""}) for n in nodes.values() if n.type == "ruling"]  # case names off
+    score = dict(zip((n.id for n in held), FlatIndex.bm25(held).score(text)))
+    return [r for r in sorted(cand, key=lambda r: -score[r]) if score[r] > 0][:m]
 
 
 def _first(clauses: list[Clause], pattern: re.Pattern, skip: str) -> Clause | None:
@@ -90,7 +107,7 @@ def graph_retrieve(clause_id: str, lease: Lease, k: int = 5, seeds: int = 3, dec
             if nb in score:  # a provision, not an illustration
                 cand[nb] = max(cand.get(nb, float("-inf")), score[nb], decay * score[nid])
     top = sorted(cand, key=lambda i: (-cand[i], i))[:k]
-    rulings = list(dict.fromkeys(r for p in top for r in rulings_of(p, edges) if r in nodes))[:max_rulings]
+    rulings = pick_rulings(clause.text, top, nodes, edges, max_rulings)
     out_nodes = [nodes[i].model_dump() for i in top + rulings]
     out_nodes += [{"id": c.clause_id, "type": "lease_clause", "label": f"Lease clause {c.number} {c.heading}".strip(),
                    "text": c.text} for c in evidence]
