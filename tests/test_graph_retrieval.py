@@ -38,6 +38,15 @@ def test_a_clause_brings_the_definitions_it_uses():
     assert "L00-1.2" in retrieve("L00-22", L00, mode="graph")["path"]
 
 
+def test_a_long_lease_clause_is_cut_to_its_first_1500_characters_and_stays_in_the_path():
+    long = L00.model_copy(update={"clauses": [c.model_copy(update={"text": c.text + " x" * 2000})
+                                              if c.clause_id == "L00-18" else c for c in L00.clauses]})
+    out = retrieve("L00-17", long, mode="graph")
+    arb = next(n for n in out["nodes"] if n["id"] == "L00-18")
+    assert arb["text"] == next(c for c in long.clauses if c.clause_id == "L00-18").text[:1500]
+    assert out["path"] == retrieve("L00-17", L00, mode="graph")["path"]
+
+
 def test_a_clause_with_no_links_brings_no_lease_clauses():
     assert all(n["type"] != "lease_clause" for n in retrieve("L00-5", L00, mode="graph")["nodes"])
 

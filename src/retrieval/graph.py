@@ -21,6 +21,11 @@ the three jurisdiction cases. Dev, 15 Nov (61 items, 17 rulings), items given a 
 (s.27, jurisdiction, time limits, Exception 1): time limits 18/20 (in order: 0/20), court bars 17/20 (14/20),
 restraint 7/20 (8/20; s.27 itself is in the top 5 for only 9 of them). Adding the provision's score made it
 worse (28 against 42 in all); 1 or 2 rulings found fewer of the right kind (31, 39).
+
+Lease clauses go into the evidence cut to their first 1,500 characters, the same cut the agent makes before
+verify (src/agent/controller.py, `_evidence`). Uncut, a long term clause ran the 7B model out of memory on a
+T4: B1-graph on test, 15 Nov, stopped in L07, whose term is in its 19,082-character preamble (prompts of
+27-29k characters; the longest that had run was 17.8k). The path is unchanged, so retrieval-v1's figures stand.
 """
 
 import re
@@ -38,6 +43,7 @@ LEASE_END = re.compile(
     r"\b(after|expiry|expiration|termination|determination|end)\s+of\s+(the|this)\s+(said\s+)?(lease|term|deed|tenancy|lease period)\b"
     r"|\block-?\s?in\b|\bduring the (term|lease|currency)\b", re.I)
 TERM_CLAUSE = re.compile(r"\b(lease|term|tenancy|deed)\b[^.]{0,60}\bfor a (period|term) of\b|\bperiod of (the )?lease\b", re.I)
+LEASE_CHARS = 1500  # characters of each lease clause passed on, as in src/agent/controller.py
 
 
 @lru_cache(maxsize=None)
@@ -110,5 +116,5 @@ def graph_retrieve(clause_id: str, lease: Lease, k: int = 5, seeds: int = 3, dec
     rulings = pick_rulings(clause.text, top, nodes, edges, max_rulings)
     out_nodes = [nodes[i].model_dump() for i in top + rulings]
     out_nodes += [{"id": c.clause_id, "type": "lease_clause", "label": f"Lease clause {c.number} {c.heading}".strip(),
-                   "text": c.text} for c in evidence]
+                   "text": c.text[:LEASE_CHARS]} for c in evidence]
     return {"nodes": out_nodes, "path": top + rulings + [c.clause_id for c in evidence]}
