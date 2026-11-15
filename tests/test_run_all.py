@@ -50,3 +50,9 @@ def test_controller_uses_the_dev_choice():
     a = argparse.Namespace(items="x/items.jsonl", leases="l", adapter="ad", reasoning="direct", out="o")
     argv = run_all.argv_for(cfg, a)
     assert "--no-seed-search" in argv and argv[argv.index("--reasoning") + 1] == "direct"
+
+
+def test_only_keeps_the_named_configurations():
+    assert [c["name"] for c in run_all.plan(10, "ad", only=["agent-fixed", "B1-graph"])] == ["B1-graph", "agent-fixed"]
+    with pytest.raises(SystemExit):
+        run_all.main(["--items", str(FIX / "items.jsonl"), "--only", "B9", "--list"])
