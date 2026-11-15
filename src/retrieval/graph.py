@@ -20,7 +20,9 @@ at most 3, and none that shares no word with it. Taking them in provision order 
 the three jurisdiction cases. Dev, 15 Nov (61 items, 17 rulings), items given a ruling of their own kind
 (s.27, jurisdiction, time limits, Exception 1): time limits 18/20 (in order: 0/20), court bars 17/20 (14/20),
 restraint 7/20 (8/20; s.27 itself is in the top 5 for only 9 of them). Adding the provision's score made it
-worse (28 against 42 in all); 1 or 2 rulings found fewer of the right kind (31, 39).
+worse (28 against 42 in all); 1 or 2 rulings found fewer of the right kind (31, 39). After the lawyer's
+corrections to the holdings (15 Nov, Nos. 5, 15 and 18; docs/legal/rulings_review.md), the same check gives
+18, 17 and 6 (41); provisions and lease clauses are unchanged on every dev and test item.
 
 Lease clauses go into the evidence cut to their first 1,500 characters, the same cut the agent makes before
 verify (src/agent/controller.py, `_evidence`). Uncut, a long term clause ran the 7B model out of memory on a
