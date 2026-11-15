@@ -3,6 +3,8 @@
 python -m src.eval.run_all --items data/test/items.jsonl --list --chunks 2              # the plan: chunks and hours
 python -m src.eval.run_all --items data/test/items.jsonl --chunk 1 --chunks 2 \
     --adapter /kaggle/input/.../qlora-1000/adapter --out /kaggle/working/runs             # one Kaggle session
+python -m src.eval.run_all --items data/test/items.jsonl --only agent-fixed,agent-controller \
+    --adapter /kaggle/input/.../qlora-2000/adapter --out /kaggle/working/runs             # only these configurations
 python -m src.eval.run_all --items data/test/items.jsonl --where laptop \
     --frontier-model <model id> --frontier-backend <backend> --out runs                   # B2 (frontier) on the laptop
 python -m src.eval.run_all --table runs                                                  # results table from metrics.json
@@ -26,6 +28,7 @@ OPEN = "Qwen/Qwen2.5-7B-Instruct"
 CONFIGS = [
     ("B1-none", "kaggle", ["--agent", "pipeline", "--mode", "none"], 1),
     ("B1-flat", "kaggle", ["--agent", "pipeline", "--mode", "flat"], 1),
+    ("B1-graph", "kaggle", ["--agent", "pipeline", "--mode", "graph"], 1),
     ("agent-fixed-noadapter", "kaggle", ["--agent", "fixed"], 1),
     ("agent-fixed", "kaggle", ["--agent", "fixed", "ADAPTER"], 1),
     # Dev, 13 Nov: direct without the seed search had the best F1 (0.91); the seed search cost it 4 void clauses.
@@ -36,10 +39,10 @@ CONFIGS = [
 SECONDS_PER_CALL = {"kaggle": 10.0, "laptop": 15.0}  # 7B on a T4, unbatched with long prompts: 8.2 s measured (section 9)
 
 
-def plan(n_items: int, adapter: str | None, where: str = "kaggle") -> list[dict]:
+def plan(n_items: int, adapter: str | None, where: str = "kaggle", only: list[str] | None = None) -> list[dict]:
     out = []
     for name, place, args, calls in CONFIGS:
-        if place != where or ("ADAPTER" in args and not adapter):
+        if place != where or ("ADAPTER" in args and not adapter) or (only and name not in only):
             continue
         out.append({"name": name, "args": args, "hours": round(n_items * calls * SECONDS_PER_CALL[place] / 3600, 2)})
     return out
@@ -88,6 +91,7 @@ def main(argv=None):
     ap.add_argument("--where", default="kaggle", choices=["kaggle", "laptop"])
     ap.add_argument("--frontier-model", default=None, help="B2 model id (laptop runs)")
     ap.add_argument("--frontier-backend", default=None, help="B2 backend of src.models.generate (laptop runs)")
+    ap.add_argument("--only", default=None, help="comma-separated configuration names, when the runs are shared between accounts")
     ap.add_argument("--chunks", type=int, default=1)
     ap.add_argument("--chunk", type=int, default=None, help="run only this chunk (1-based)")
     ap.add_argument("--list", action="store_true", help="print the chunks and estimated hours, run nothing")
@@ -101,7 +105,11 @@ def main(argv=None):
     if a.where == "laptop" and not a.list and not (a.frontier_model and a.frontier_backend):
         ap.error("--where laptop needs --frontier-model and --frontier-backend")
     n = len(read_jsonl(a.items, LabelledItem))
-    bins = chunk(plan(n, a.adapter, a.where), a.chunks)
+    only = a.only.split(",") if a.only else None
+    unknown = set(only or []) - {c[0] for c in CONFIGS}
+    if unknown:
+        ap.error(f"unknown configuration: {', '.join(sorted(unknown))}")
+    bins = chunk(plan(n, a.adapter, a.where, only), a.chunks)
     for i, b in enumerate(bins, 1):
         print(f"chunk {i}: {sum(c['hours'] for c in b):.1f} h estimated: " + ", ".join(f"{c['name']} ({c['hours']} h)" for c in b))
     if a.list:
