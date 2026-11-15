@@ -497,13 +497,14 @@ Everything ran on free Kaggle sessions (2 × T4) and one laptop; no paid compute
 
 | Stage | GPU-hours (wall time × 2 GPUs) |
 |---|---|
-| Training-pair generation, 2,400 requests | *to add from the session-1 log* |
+| Training-pair generation, 2,400 requests | 11.1 (5.5 h wall) |
 | QLoRA at 250, 500, 1,000 and 2,000 pairs | 16.1 (8.1 h wall) |
 | Dev runs of the agent (11 runs) | 11.5 |
 | Test runs, B1-none and B1-flat | 3.2 |
 | Test runs, agent (3 runs, 4.5 h wall) | 9.1 |
 | Test run, B1-graph | 1.8 |
 | B2 (frontier, laptop, no GPU) | 0 |
+| **Total** | **52.8** (26.4 h wall) |
 
 Peak GPU memory was 11.9 GB in training and 9.5 to 13 GB for the agent runs on dev, spread over the two T4s. Each run folder has its `config.json` with the git commit, seed, platform, GPU type and GPU hours.
 
