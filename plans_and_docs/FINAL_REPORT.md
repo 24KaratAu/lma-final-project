@@ -41,7 +41,122 @@ For reference by the later sections, the test set has 340 items: 154 void, 113 v
 
 ## 4. Statute graph and retrieval
 
-*Saksham's section: nodes and edges, ruling nodes, flat and graph retrieval, the dev retrieval figures (exact provision recall@5: flat 0.27, graph 0.75), `retrieval-v1`.*
+The verifier decides on the text it is given. This section describes where that text comes from: the Contract Act as a graph, and each lease's own links between its clauses. It also covers the two ways the pipeline configurations of section 7 retrieve from them. The code is in `src/graph/` and `src/retrieval/`, and the data in `data/statute/` and `data/leases/`.
+
+### 4.1 The statute graph
+
+The graph is built from the India Code text of the Indian Contract Act, 1872 (`src/graph/statute.py`). It has 192 sections in force, 7 exceptions, 15 explanations, 201 illustrations and 17 rulings. Ids follow the Act: `ICA-28` is a section, `ICA-28-E1` its first exception, `ICA-28-X1` its explanation and `ICA-29-Ia` an illustration. Repealed sections are left out. The wording is as printed, without footnotes or amendment brackets.
+
+| Edge | From → to | Count | How it is made |
+|---|---|---|---|
+| `exception_to` | exception → its section | 7 | parsed from the Act's layout |
+| `explains` | explanation → its section | 15 | parsed |
+| `illustrates` | illustration → its section | 201 | parsed |
+| `refers_to` | section → a section it names | 11 | found by pattern, each checked by hand |
+| `interprets` | ruling → the provision it interprets | 17 | by hand, from the rulings sheet |
+
+**Rulings.** In Session 1 the lawyer listed 18 leading judgments on ss.27 and 28. A judgment became a ruling node only once one of us had read it and written its holding in one sentence of our own (`data/statute/rulings.csv`, built by `src/graph/rulings.py`). The sheet records the source, the reader and the date. The lawyer's own one-line notes never enter the graph.
+
+Seventeen were read: five on s.27, three on the choice of court and three on time limits under s.28, and six on Exception 1 (arbitration). The eighteenth, *Madhub Chunder* (1874), has no reliable text online, so it stays out until it has been read.
+
+The lawyer checked the 17 holdings, corrected three (Nos. 5, 15 and 18) and signed off the revised sheet. The summaries state each court's holding correctly for the purposes of the project. The sign-off covers the summaries, not the system's outputs (`docs/legal/rulings_review.md`).
+
+### 4.2 The lease's own links
+
+The lease parser (`src/graph/lease_parser.py`) splits each deed into clauses in the deed's own numbering (`12A`, `5.5(d)`, `XXVIII(d)`). A clause's text includes its sub-clauses. The parser lists the defined terms and adds two kinds of link:
+- `uses_term`, from a clause to the definition of a term it uses;
+- `refers_to`, from a clause to another clause it cites by number.
+
+The 20 test deeds have 2,108 clauses, 109 definitions, 621 `uses_term` links and 213 `refers_to` links. These links are what make a cross-clause item answerable: of the 102 lease clauses that the test set's cross-clause items depend on, 84 are one link from the target clause.
+
+### 4.3 Flat retrieval
+
+BM25 over the 214 provisions (sections, exceptions and explanations; illustrations are left out), queried with the clause text. The top 5 are the evidence. BM25 was chosen over dense embeddings on dev for the mid-submission. BGE-small found the right section in the top 5 for 55% of items, against 78% for BM25, because it matched on topic and pulled in illustrations about leases and bailment.
+
+### 4.4 Graph retrieval
+
+Graph retrieval (`src/retrieval/graph.py`) builds the evidence in five steps:
+
+1. **Seed.** The 3 provisions that BM25 ranks highest for the clause text.
+2. **Expand.** One hop from each seed along `exception_to` and `explains`, in both directions, and along `refers_to`. A neighbour takes its seed's score, or its own if that is higher.
+3. **Rerank.** The 5 highest-scoring provisions are kept.
+4. **Rulings.** Of the rulings that interpret those 5 provisions, up to 3 whose holding best matches the clause, by BM25 on the holding with the case names removed. A ruling that shares no word with the clause is left out.
+5. **Lease clauses.** The clauses and definitions the target clause links to, one hop out. Two more come by rule, because the lawyer's element checklists ask for them and no link points to them:
+   - for a clause about disputes, courts or final decisions, the deed's arbitration clause;
+   - for a clause tied to the end of the lease, the deed's term clause.
+
+   Each lease clause is cut to its first 1,500 characters (section 4.8).
+
+The evidence path lists the provisions first, then the rulings, then the lease clauses, so exact provision recall@5 reads only statute nodes.
+
+**Settings, chosen on dev only** (60 items with a gold provision):
+- **3 seeds, no decay on expansion, and the clause text alone as the query.** Adding the linked lease clauses to the query made the seeds noisier: exact provision recall@5 fell from 0.75 to 0.68.
+- **One hop on the lease side.** A second hop found nothing more.
+- **Rulings picked by how well their holding matches the clause.** Taking rulings in provision order gave every s.28 clause the same three jurisdiction cases. Time-limit items then got a time-limit ruling in 0 of 20 cases, against 18 of 20 with matching.
+
+The settings were frozen and tagged `retrieval-v1` (commit `d86d757`) before retrieval was measured on the test set.
+
+**How this differs from the agent's evidence** (section 5.1):
+- **Seeds:** the fixed-policy agent searches with 5 seeds and passes the first 8 statute nodes it finds.
+- **Rulings:** the agent adds none.
+- **Lease clauses:** it reads only the clauses the target links to, with no arbitration or term clause by rule.
+
+### 4.5 Retrieval results
+
+Retrieval alone, scored against the gold provision and the gold evidence path (`src/retrieval/evaluate.py`). Out-of-scope items have no gold provision and are skipped. "Section" counts any node of the gold provision's section. "Lease" is the share of the gold path's lease clauses that are found, on items whose gold path has any.
+
+| | Dev, flat | Dev, graph | **Test, flat** | **Test, graph** |
+|---|---|---|---|---|
+| Items | 60 | 60 | 302 | 302 |
+| Exact provision recall@1 | 0.15 | 0.50 | 0.11 | 0.36 |
+| Exact provision recall@5 | 0.27 | 0.75 | **0.22** | **0.66** |
+| Section recall@5 | 0.78 | 0.75 | **0.73** | **0.66** |
+| Section recall@10 | 0.80 | 0.77 | 0.82 | 0.66 |
+| Lease clauses of the gold path found | 0 | 0.75 | 0 | **0.91** |
+
+On the test set, by type and form (exact provision recall@5 / section recall@5):
+
+| | Restraint of trade (100) | Bar on proceedings (102) | Time limit (100) | Single clause (203) | Cross-clause (99) |
+|---|---|---|---|---|---|
+| Flat | 0.09 / 0.66 | 0.31 / 0.82 | 0.26 / 0.70 | 0.19 / 0.71 | 0.29 / 0.76 |
+| Graph | 0.60 / 0.60 | 0.76 / 0.77 | 0.60 / 0.60 | 0.64 / 0.64 | 0.69 / 0.70 |
+
+- **Graph retrieval finds the exact provision three times as often** (0.66 against 0.22), on every type and form. A section's exceptions and explanations come with it. The right exception arrives with its section instead of having to win on shared words. Flat retrieval often ranks Exception 3 to s.28 (bank guarantees), a long node with broad vocabulary, first when it is not the answer: on 44 of the 302 test items.
+- **It finds the right section less often** (0.66 against 0.73), and more candidates do not help (0.66 at 10, against 0.82 for flat). With 3 seeds and one hop the candidate set is fixed. When the seeds miss the section, nothing brings it back. This is the cost of the setting chosen on dev, where section recall was level with flat (0.75 against 0.78).
+- **It finds 91% of the lease clauses** the gold path needs. Flat retrieval finds none, by design.
+- **Dev overstated it on time limits.** Exact provision recall@5 on time-limit items was 0.90 on dev and is 0.60 on test.
+
+### 4.6 Where graph retrieval goes wrong (test)
+
+- **It misses the gold section for 103 of the 302 items:** 40 restraint-of-trade items, 40 time limits and 23 bars on proceedings. Flat retrieval's top 5 has the section for 21 of them; 82 are missed by both.
+- **Restraint of trade:** 21 of its 40 misses retrieved s.28 instead of s.27.
+- **The other misses scatter** across sections that share the clause's words but not its subject. The most frequent are s.74 (penalty for breach, in 22 of the 103) and s.30 (wagers, 18).
+- **Rulings come only with their provisions.** A ruling can be chosen only if a provision it interprets is in the top 5. A ruling of the item's own kind is in the evidence for:
+
+  | | Restraint of trade | Bar on proceedings | Time limits |
+  |---|---|---|---|
+  | Test | 47/100 | 70/102 | 55/100 |
+  | Dev | 6/20 | 17/20 | 18/20 |
+
+  For a bar on proceedings, "own kind" means a jurisdiction ruling, or an arbitration ruling when the gold provision is Exception 1. Overall, 237 of the 340 test items get at least one ruling.
+- **Graph evidence is the longest.** The median prompt is 4,600 characters with the clause alone, 7,300 with flat retrieval and 8,200 with graph retrieval.
+
+### 4.7 From retrieval to verdicts
+
+Better retrieval did not by itself give better verdicts (section 7.6).
+- **In the plain pipeline,** B1-graph's defect F1 is level with B1-flat's: 0.807 against 0.812, interval −0.039 to +0.027. Its false alarms are higher, 0.17 against 0.12.
+- **In the agent,** the evidence did better: the fixed-policy agent without the adapter is 0.030 above flat, and 0.035 above B1-graph, an interval that excludes zero.
+
+The two give the model different text: the rulings, the arbitration and term clauses, and 3 seeds against 5 (section 4.4). We have not isolated which of these accounts for the difference. H2's retrieval claim holds for the exact provision and for the lease clauses, but not for the section.
+
+### 4.8 Changes made after the first test runs
+
+Two changes reached graph retrieval's input after other configurations had been scored on the test set. Neither was made in response to a score. B1-graph was scored once, after both.
+
+1. **Lease clauses cut to 1,500 characters** (`b7ee5e7`). The first B1-graph run ran out of GPU memory in L07. That deed states its term in a 19,082-character preamble, which the term-clause rule passed whole, giving prompts of 27,000–29,000 characters. The cut is the one the agent already made before verify (section 5.1). The evidence path is unchanged, so the retrieval figures above stand. The 86 predictions made before the crash were never scored.
+2. **The lawyer's corrections to three holdings** (`6a229d1`). They arrived while the second B1-graph run was going; that run was cancelled and never scored. Only the choice of rulings changed. The provisions and lease clauses are the same on every dev and test item, and the dev count of items given a ruling of their own kind went from 42 to 41.
+
+No other configuration is affected: flat retrieval and the agent never read rulings, and the agent already cut lease clauses.
 
 ---
 
