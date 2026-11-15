@@ -2,7 +2,7 @@
 
 **Project:** Statute-grounded enforceability checking for Indian commercial leases
 **Date:** Sun 15 Nov 2026 · **Repository:** https://github.com/24KaratAu/lma-final-project (tag `final`)
-**Team:** Saksham Goyal (data, legal validation, statute graph, retrieval), Avnish Uba (agent, fine-tuning, evaluation)
+**Team:** Saksham Goyal (data, legal validation, statute graph, retrieval), Avnish Uba (agent, fine-tuning, evaluation), Amitabh Anand (training-pair generation trials, base-model choice, B1 baseline and flat-retrieval ablation for the mid-submission)
 
 Numbers marked **dev** are on the 61-item dev set, where every choice was made. Numbers marked **test** are on the frozen test set `test-v1` (340 items), which was run once per configuration after the freeze.
 
