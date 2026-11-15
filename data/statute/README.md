@@ -25,4 +25,6 @@ The 18 leading judgments the lawyer listed in Session 1 (`../../docs/legal/sessi
 
 `lawyer_note` is the lawyer's one-line summary, kept as a pointer for the reader. It never goes into the graph, and no AI writes a holding. When all rows are read, send the holdings to the lawyer to check (Session 2 asked for them).
 
+The lawyer checked the 17 holdings on 15 Nov 2026 (`../../docs/legal/rulings_review.md`). No. 5 now uses the judgment's wording, and Nos. 15 and 18 add the points the lawyer asked for, in the lawyer's words: No. 15 overruled *Himangni*, and No. 18 applies prospectively. RUL-01 stays unread: it is known only through *Percept D'Mark* until the Bengal Law Reports text is read. The lawyer signs off the revised sheet.
+
 Flat retrieval and the agent's `search_graph` index only sections, exceptions and explanations, and the agent never follows an `interprets` edge from a section to a ruling, so ruling nodes do not change their results. Graph retrieval (`src/retrieval`, mode `graph`) is what uses them.
