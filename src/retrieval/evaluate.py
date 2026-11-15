@@ -4,6 +4,7 @@ python -m src.retrieval.evaluate --items data/dev/items.jsonl --leases data/leas
 
 "exact": the gold provision (e.g. ICA-28-E1) is in the top k.
 "section": some node of the gold provision's section (ICA-28, its exceptions...) is in the top k.
+"lease": share of the lease clauses in the gold path (definitions, linked clauses) found anywhere in the path.
 Items with no gold provision (out of scope) are skipped.
 """
 
@@ -40,8 +41,13 @@ def evaluate(items: list[LabelledItem], leases: dict, mode: str) -> dict:
             hits = sum(it.gold_provision in path[:k] for it, path in subset)
         return round(hits / len(subset), 4)
 
+    def lease_recall(subset):
+        gold = [(p, path) for it, path in subset for p in it.gold_path if not p.startswith("ICA-")]
+        return round(sum(p in path for p, path in gold) / len(gold), 4) if gold else None
+
     def block(subset):
-        return {"n": len(subset)} | {f"exact@{k}": recall(subset, k) for k in KS} | {f"section@{k}": recall(subset, k, True) for k in KS}
+        return ({"n": len(subset)} | {f"exact@{k}": recall(subset, k) for k in KS} | {f"section@{k}": recall(subset, k, True) for k in KS}
+                | {"lease": lease_recall(subset)})
 
     out = {"overall": block(rows)}
     for field in ("defect_type", "form"):
@@ -55,7 +61,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--items", default="data/dev/items.jsonl")
     ap.add_argument("--leases", default="data/leases")
-    ap.add_argument("--modes", nargs="+", default=["flat", "dense"])
+    ap.add_argument("--modes", nargs="+", default=["flat", "graph"])
     ap.add_argument("--out", default="runs")
     args = ap.parse_args(argv)
     items = read_jsonl(args.items, LabelledItem)

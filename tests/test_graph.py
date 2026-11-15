@@ -227,5 +227,5 @@ def test_retrieve_flat_returns_k_statute_nodes():
     assert len(out["path"]) == 5 and out["path"] == [n["id"] for n in out["nodes"]]
     assert any(p.startswith("ICA-28") for p in out["path"])
     assert retrieve(item.clause_id, LEASES[item.lease_id], mode="none")["path"] == []
-    with pytest.raises(NotImplementedError):
-        retrieve(item.clause_id, LEASES[item.lease_id], mode="graph")
+    with pytest.raises(ValueError, match="unknown retrieval mode"):
+        retrieve(item.clause_id, LEASES[item.lease_id], mode="sparse")
