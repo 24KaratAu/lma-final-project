@@ -358,7 +358,15 @@ The brief asks that the agent pick the right tools, pass valid arguments and rec
 - **It expands s.27 by default.** `expand` was called on s.27 178 times and on s.28 66 times. On the 91 bar-on-proceedings and time-limit items where it expanded s.27, accuracy is 0.64, against 0.72 on the rest.
 - **The lease side works.** For cross-clause items it fetched the clause the answer depends on in 81 of 99, close to the fixed policy, which follows the lease's links.
 
-**Tool-call accuracy against gold traces (dev).** *Saksham: agreement with the 30 gold tool traces, scored against `runs/session1/runs/agent-direct-qwen7b-dev/traces.jsonl`. That is the dev run of this same controller set-up (direct prompt, no opening search; the planner is the base model in both).*
+**Tool-call accuracy against the gold evidence paths.** Every item carries a gold evidence path, written with the answer key: the lease clauses the answer depends on and the provision that decides it. Scoring the clauses and provisions the agent's calls actually fetched against that path:
+
+| Fetched by the tool calls | Full system, dev (61) | Full system, test (340) | Fixed policy, test (340) |
+|---|---|---|---|
+| Supporting lease clauses | 13 of 20 | 81 of 102 | 84 of 102 |
+| The exact provision | 8 of 60 | 45 of 302 | 220 of 302 |
+| The whole gold path | 6 of 60 | 38 of 302 | 207 of 302 |
+
+The dev column is the dev run of the same controller set-up (`runs/session1/runs/agent-direct-qwen7b-dev`: direct prompt, no opening search, the same base-model planner). On both sets the controller's calls find the lease clauses about as well as the fixed policy does, and miss the statute provision most of the time, for the reasons above.
 
 ---
 
