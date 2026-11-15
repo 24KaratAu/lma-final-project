@@ -73,10 +73,15 @@ def argv_for(cfg: dict, a) -> list[str]:
 def table(runs: str) -> str:
     """One row per run: overall scores, then accuracy on cross-clause items."""
     cols = ["verdict_accuracy", "defect_recall", "defect_precision", "defect_f1", "false_alarm_rate", "citation_correct", "section_recall@5"]
-    rows = ["| Run | n | " + " | ".join(cols) + " | cross-clause accuracy |", "|" + "---|" * (len(cols) + 3)]
+    # section_recall@5 in src/eval/score.py is the exact gold provision in the first 5 of the path (exact@5 in src/retrieval/evaluate.py)
+    names = [c if c != "section_recall@5" else "exact provision recall@5" for c in cols]
+    rows = ["| Run | n | " + " | ".join(names) + " | cross-clause accuracy |", "|" + "---|" * (len(cols) + 3)]
     for m in sorted(Path(runs).glob("*/metrics.json")):
         res = json.loads(m.read_text())
         o, cross = res["overall"], res.get("form=cross", {})
+        cfg = json.loads(m.with_name("config.json").read_text()) if m.with_name("config.json").exists() else {}
+        if cfg.get("agent", "pipeline") == "pipeline" and cfg.get("mode") == "none":
+            o = o | {"section_recall@5": None}  # nothing is retrieved, so it is 0 by construction
         fmt = lambda v: "–" if v is None else f"{v:.2f}"
         rows.append(f"| {m.parent.name} | {o['n']} | " + " | ".join(fmt(o.get(c)) for c in cols) + f" | {fmt(cross.get('verdict_accuracy'))} |")
     return "\n".join(rows)
