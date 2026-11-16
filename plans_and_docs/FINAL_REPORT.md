@@ -26,6 +26,8 @@ The premise behind the proposal, that frontier models miss these defects, did no
 
 **The answer in one paragraph.** The untuned 7B model is already within 0.047 F1 of the frontier model (0.837 against 0.884). The best small-model configuration on the test set is the agent with its tools in a fixed order and **no** adapter (F1 0.842, false alarms 0.10). The two things we expected to close the gap, the tuned verifier and the model-driven controller, both looked better on dev and both were worse on test: the full system scores 0.808. The tuned verifier learned to hand clauses off. It gets 85% of the hand-off items right where the base model gets 37%, but it also hands off 42 valid and 28 void clauses. On cross-clause items every small-model configuration matches or beats the frontier model.
 
+**What is new.** Not the pipeline: we claim nothing new in tool calling, agents or fine-tuning a clause classifier. The contribution is (1) a test set of 340 Indian lease clauses with statutory ground truth, each tied to the provision and the evidence path that decide it and labelled blind by a lawyer; (2) a measurement, on that set, of how a small open model and a frontier model handle Indian statutory defects and their valid look-alikes; and (3) evidence on whether retrieval that joins a lease's own definitions to the Act's exceptions beats flat retrieval, broken down by defect type and form.
+
 ### 1.1 Related work
 
 **Legal NLP benchmarks.** LexGLUE (Chalkidis et al., 2022) and LegalBench (Guha et al., 2023) test models on many legal tasks. The closest in material are CUAD (Hendrycks et al., 2021) and ContractNLI (Koreeda and Manning, 2021), which are about contract review: finding clause types and deciding what a contract entails. For Indian law, ILDC (Malik et al., 2021) and IL-TUR (Joshi et al., 2024) work on court judgments, not contracts. None of them asks whether a clause is enforceable under a named statute, which provision decides it, or whether a lawyer should decide instead. Our test set asks all three, for two sections of one Act.
@@ -358,7 +360,15 @@ The brief asks that the agent pick the right tools, pass valid arguments and rec
 - **It expands s.27 by default.** `expand` was called on s.27 178 times and on s.28 66 times. On the 91 bar-on-proceedings and time-limit items where it expanded s.27, accuracy is 0.64, against 0.72 on the rest.
 - **The lease side works.** For cross-clause items it fetched the clause the answer depends on in 81 of 99, close to the fixed policy, which follows the lease's links.
 
-**Tool-call accuracy against gold traces (dev).** *Saksham: agreement with the 30 gold tool traces, scored against `runs/session1/runs/agent-direct-qwen7b-dev/traces.jsonl`. That is the dev run of this same controller set-up (direct prompt, no opening search; the planner is the base model in both).*
+**Tool-call accuracy against the gold evidence paths.** Every item carries a gold evidence path, written with the answer key: the lease clauses the answer depends on and the provision that decides it. Scoring the clauses and provisions the agent's calls actually fetched against that path:
+
+| Fetched by the tool calls | Full system, dev (61) | Full system, test (340) | Fixed policy, test (340) |
+|---|---|---|---|
+| Supporting lease clauses | 13 of 20 | 81 of 102 | 84 of 102 |
+| The exact provision | 8 of 60 | 45 of 302 | 220 of 302 |
+| The whole gold path | 6 of 60 | 38 of 302 | 207 of 302 |
+
+The dev column is the dev run of the same controller set-up (`runs/session1/runs/agent-direct-qwen7b-dev`: direct prompt, no opening search, the same base-model planner). On both sets the controller's calls find the lease clauses about as well as the fixed policy does, and miss the statute provision most of the time, for the reasons above.
 
 ---
 
@@ -367,6 +377,8 @@ The brief asks that the agent pick the right tools, pass valid arguments and rec
 ### 6.1 Training pairs
 
 The pairs are synthetic. Qwen2.5-7B-Instruct was asked for 2,400 clauses, each with a requested defect type, phrasing family, verdict and form (a third cross-clause, with the definition it depends on). Each reply was checked by rules: it must parse, follow the schema, name an allowed provision, and its stated elements must give the requested verdict under the lawyer's element checklist. **2,121 of 2,400 were kept (88%).** The main reasons for rejection were elements that disagreed with the rules (199), schema errors (65), a wrong verdict (53) and unparseable replies (53).
+
+The full run came after 100-pair trials, as the TA asked: the first kept 0 of 100 and the second 67 of 100, and the prompt was fixed between them (PLAN.md section 9, the trial table; mid-submission, section 5.4).
 
 Three phrasing families (RT-5, BP-3, TL-4) were never generated, so the test set contains wording the verifier was not trained on. The generation config was committed before any test item was written. No test or dev clause is in the training pairs.
 
@@ -420,7 +432,7 @@ Every configuration is one call of `src/eval/run.py` through `src/eval/run_all.p
 
 ### 7.2 Metrics
 
-A **defect** is a clause whose gold verdict is void. Defect recall, precision and F1 are over void against not-void. The **false-alarm rate** is the share of valid and hand-off clauses called void. **Citation correct** is the share of items with a gold provision where the cited provision matches it exactly. **Exact provision recall@5** is the share where the gold provision is among the first five nodes of the evidence path; it is blank where nothing is retrieved. A missing prediction counts as wrong.
+A **defect** is a clause whose gold verdict is void. Defect recall, precision and F1 are over void against not-void. The **false-alarm rate** is the share of valid and hand-off clauses called void. **Citation correct** is the share of items with a gold provision where the cited provision matches it exactly. **Exact provision recall@5** is the share where the gold provision is among the first five nodes of the evidence path; it is blank where nothing is retrieved. A missing prediction counts as wrong. Every metric is computed against the gold labels; no LLM judge is used anywhere.
 
 ### 7.3 Test set (`test-v1`, 340 items)
 
@@ -509,6 +521,53 @@ The two give the model different evidence. The agent passes the sections with th
 
 **Cross-clause items.** Every small-model configuration is level with or above the frontier model here (0.80 to 0.86 against 0.79), and the fixed-policy agent without the adapter is 0.07 above it. On single clauses the frontier model is far ahead (0.94 against 0.80 to 0.84). The frontier model's lead is in reading one clause precisely; where the answer depends on another clause, reading that clause is what counts, and a small model given the clause does as well.
 
+### 7.7 The proposal's capability and safety metrics (test)
+
+The proposal (section 12) listed one metric or more per capability, and three safety metrics. Those not already in section 7.3 are here, computed from the same test predictions.
+
+| Run | Macro-F1 over the three verdicts | Cross-clause defect recall | Hand-off precision | Abstention recall | Void clause called valid | Cited provision not in the evidence |
+|---|---|---|---|---|---|---|
+| B1-none | 0.68 | 0.82 | 0.62 | 0.66 | 0.13 | – |
+| B1-flat | 0.67 | 0.77 | 0.67 | 0.71 | 0.20 | 0.81 |
+| B1-graph | 0.65 | 0.82 | 0.64 | 0.61 | 0.19 | 0.38 |
+| agent-fixed-noadapter | 0.66 | **0.86** | 0.64 | 0.66 | 0.19 | 0.26 |
+| agent-fixed | 0.68 | 0.79 | 0.47 | 0.89 | **0.05** | **0.24** |
+| agent-controller (full system) | 0.68 | 0.77 | 0.50 | 0.87 | **0.05** | 0.80 |
+| B2-none | **0.79** | 0.73 | 0.55 | **0.92** | 0.00 | – |
+| B2-flat | **0.79** | 0.73 | 0.55 | **0.92** | 0.01 | 0.76 |
+
+- **Cross-clause defect recall** (agentic): share of the 56 void cross-clause items called void.
+- **Hand-off precision** (agentic): share of a run's hand-offs whose gold verdict is hand off. Counting only out-of-scope clauses, as the proposal defined it, gives about 0.60 without the adapter and 0.26 to 0.27 with it.
+- **Abstention recall** (safety): share of the 38 out-of-scope clauses handed off.
+- **Void clause called valid** (safety, "missed defect as safe"): share of the 154 void clauses given the verdict valid, with no hand-off.
+- **Cited provision not in the evidence** (safety, "unsupported verdict"): share of verdicts with a citation whose cited node was not retrieved in that run. It is blank where nothing is retrieved. Citations of a node that is not in the graph at all: 15 for B1-flat, 11 for B1-graph, 2 or 3 for the other runs without the adapter, and none with the adapter or for B2.
+
+**The adapter makes the system safer in the way that matters most to a tenant.** With it, a void clause is called valid 5% of the time; without it, 19%. It gets there by handing off, which is also what costs it accuracy on valid clauses (section 7.6).
+
+**Unsupported verdicts are common.** The proposal said the code would reject a citation of a node that was not retrieved. That check was not built, so the rate is reported instead. Even the fixed policy cites a provision outside its evidence for a quarter of its verdicts, and the full system for 80%, because its searches seldom retrieve the provision (section 5.4). The citation is usually right all the same (section 7.3), which means it comes from the model's memory and not from the retrieved text.
+
+**Element accuracy** (reasoning): the share of gold checklist facts the verifier got right, over the 1,220 gold facts with a fixed set of values (the two free-text facts, the period and its trigger, are left out). It is 0.78 for the agent without the adapter, 0.65 with the adapter and 0.65 for the full system. A hand-off as out of scope carries no facts, so the adapter's hand-offs lower it. The single-pass runs did not log the facts.
+
+**The verifier on phrasing families it was not trained on** (fine-tuning). Three families were held out of the training pairs on purpose (RT-5, BP-3, TL-4; section 6.1). The training pairs covered eight families; the test set has 24.
+
+| Accuracy (macro-F1) | Families in the training pairs (155 items) | The three held-out families (59) | Other families not in training (126) |
+|---|---|---|---|
+| Agent, fixed, no adapter | 0.80 (0.70) | **0.68** (0.49) | 0.63 (0.61) |
+| Agent, fixed, adapter | 0.81 (**0.77**) | 0.44 (0.41) | **0.69** (**0.68**) |
+| Full system | **0.82** (**0.78**) | 0.44 (0.38) | 0.67 (0.66) |
+
+**The adapter's loss is concentrated in two held-out families.** It helps on the families it was trained on and on the other unseen ones, and it collapses on the held-out three. It hands off all 17 RT-5 clauses (a landlord's promise not to let to the tenant's competitors; 12 are valid) and 17 of the 20 BP-3 clauses (exclusive jurisdiction of a named city). On TL-4 it holds (0.77 against 0.82). So the tuned verifier does not generalise to a kind of clause it has never seen: it hands it off. That is safe, but it costs accuracy: 22 of the 42 valid clauses it hands off are in these two families. H3 is about defect F1, which hand-offs of valid clauses do not change; what lowers the adapter's F1 is the 28 void clauses it hands off.
+
+**What the proposal promised that we did not do.**
+
+- **Three seeds** for the full system and naive RAG: each configuration ran once (section 8.1).
+- **Ablations with the adapter kept.** The flat-retrieval and no-retrieval ablations are the runs without the adapter and the agent (B1-flat, B1-none). The "no element check" ablation was not run: every run uses the element-check prompt.
+- **Reasoning variants and the model comparison** are on dev only (section 5.3; mid-submission, section 5.2), cut from the test runs as PLAN.md section 12 allowed.
+- **B2 reads one clause per call**, not the whole lease in one pass (since the mid-submission).
+- **Tool-call accuracy** is scored against the gold evidence paths, not against hand-written tool traces (section 5.4).
+- **Tokens per lease** were not logged. Section 9 gives GPU-hours instead.
+- **The "draft for legal review" label.** The system writes predictions for scoring and has no user-facing report, so nothing carries that label.
+
 ---
 
 ## 8. Error analysis, limitations and future work
@@ -575,7 +634,7 @@ Section 8.2 covers the five single-pass runs. This section looks at the three ag
 | hand off → valid | 35 | 4 | 4 |
 | hand off → void | 11 | 7 | 9 |
 
-**The adapter trades valid and void clauses for hand-offs.** Adding the adapter to the fixed policy changes 118 verdicts. 47 become right, and 36 of those are hand-off items. 52 become wrong, and those are mostly valid (37) and void (14) clauses. In 90 of its 132 hand-offs the adapter calls the clause out of scope, and 56 of those 90 clauses are under s.27 or s.28. Out-of-scope pairs are the largest single family in the training pairs (OOS-1, 300 of 2,121 kept), which may be part of the reason; we did not test this.
+**The adapter trades valid and void clauses for hand-offs.** Adding the adapter to the fixed policy changes 118 verdicts. 47 become right, and 36 of those are hand-off items. 52 become wrong, and those are mostly valid (37) and void (14) clauses. In 90 of its 132 hand-offs the adapter calls the clause out of scope, and 56 of those 90 clauses are under s.27 or s.28. Out-of-scope pairs are the largest single family in the training pairs (OOS-1, 300 of 2,121 kept), which may be part of the reason; we did not test this. Section 7.7 shows where the hand-offs fall: 34 of the 132 are on two phrasing families that were held out of training.
 
 **Confidence cannot catch it.** The adapter gives a confidence of 0.9 on 329 of 340 answers (0.95 on the rest), so a confidence threshold could not separate its good hand-offs from its bad ones. The base model's confidences vary more (0.9, 0.95 and 1.0).
 
